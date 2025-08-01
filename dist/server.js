@@ -31,9 +31,12 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.startServer = startServer;
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield startServer();
-}))();
+// For local development
+if (process.env.NODE_ENV !== "production") {
+    (() => __awaiter(void 0, void 0, void 0, function* () {
+        yield startServer();
+    }))();
+}
 process.on("SIGTERM", () => {
     console.log("SIGTERM signal recieved... Server shutting down..");
     if (server) {
@@ -70,3 +73,5 @@ process.on("uncaughtException", (err) => {
     }
     process.exit(1);
 });
+// Default export for Vercel
+exports.default = app_1.default;

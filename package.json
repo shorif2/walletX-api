@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "lint": "npx eslint ./src",
-    "build": "tsc",
+    "build": "npm install --force && tsc",
     "start": "node ./dist/server.js"
   },
   "devDependencies": {
@@ -29,8 +29,10 @@
     "typescript-eslint": "^8.38.0"
   },
   "dependencies": {
+    "@types/connect-mongo": "^3.1.2",
     "@types/cookie-parser": "^1.4.9",
     "bcryptjs": "^3.0.2",
+    "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

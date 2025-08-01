@@ -18,9 +18,12 @@ const startServer = async () => {
   }
 };
 
-(async () => {
-  await startServer();
-})();
+// For local development
+if (process.env.NODE_ENV !== "production") {
+  (async () => {
+    await startServer();
+  })();
+}
 
 process.on("SIGTERM", () => {
   console.log("SIGTERM signal recieved... Server shutting down..");
@@ -72,4 +75,9 @@ process.on("uncaughtException", (err) => {
 
 // Promise.reject(new Error("I forget to catch this promise"));
 // throw new Error("I forgot to handle this local error");
+
+// Export for Vercel
 export { startServer };
+
+// Default export for Vercel
+export default app;

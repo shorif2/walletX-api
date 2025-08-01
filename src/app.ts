@@ -9,15 +9,32 @@ import notFound from "./app/middlewares/notFound";
 import passport from "passport";
 import "./app/config/passport";
 import path from "path";
+import MongoStore from "connect-mongo";
+
 const app = express();
 
-app.use(
-  expressSession({
-    secret: envVars.EXPRESS_SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+// Session configuration with production-ready store
+const sessionConfig: expressSession.SessionOptions = {
+  secret: envVars.EXPRESS_SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
+  // Use MongoStore for production, MemoryStore for development
+  store:
+    process.env.NODE_ENV === "production"
+      ? MongoStore.create({
+          mongoUrl: envVars.MONGO_URI,
+          collectionName: "sessions",
+          ttl: 24 * 60 * 60, // 24 hours in seconds
+        })
+      : undefined, // Use default MemoryStore in development
+};
+
+app.use(expressSession(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
