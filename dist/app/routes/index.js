@@ -7,15 +7,6 @@ const auth_route_1 = require("../modules/auth/auth.route");
 const wallet_route_1 = require("../modules/wallet/wallet.route");
 const transaction_route_1 = require("../modules/transaction/transaction.route");
 exports.router = (0, express_1.Router)();
-// Health check endpoint
-exports.router.get("/health", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "Wallet-X API is running successfully",
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || "development"
-    });
-});
 const moduleRoutes = [
     {
         path: "/user",

@@ -18,23 +18,21 @@ const catchAsync_1 = require("../../utils/catchAsync");
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const wallet_service_1 = require("../wallet/wallet.service");
-const mongoose_1 = require("mongoose");
 // id issue here
 // Add money to wallet
 const addMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { amount } = req.body;
-    const user = req.user;
-    const userId = user === null || user === void 0 ? void 0 : user._id;
-    console.log(userId);
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     if (!userId) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "User not authenticated");
     }
     // Get user's wallet
-    const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(new mongoose_1.Types.ObjectId(userId.toString()));
+    const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(userId);
     if (!wallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }
-    const transaction = yield transaction_service_1.TransactionServices.addMoney(wallet._id, new mongoose_1.Types.ObjectId(userId.toString()), amount);
+    const transaction = yield transaction_service_1.TransactionServices.addMoney(wallet._id, userId, amount);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Money added successfully",
@@ -43,18 +41,18 @@ const addMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, vo
 }));
 // Send money to another user
 const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { toUserId, amount } = req.body;
-    const user = req.user;
-    const fromUserId = user === null || user === void 0 ? void 0 : user._id;
+    const fromUserId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     if (!fromUserId) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "User not authenticated");
     }
     // Get sender's wallet
-    const fromWallet = yield wallet_service_1.WalletServices.getWalletByUserId(new mongoose_1.Types.ObjectId(fromUserId.toString()));
+    const fromWallet = yield wallet_service_1.WalletServices.getWalletByUserId(fromUserId);
     if (!fromWallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Sender wallet not found");
     }
-    const transaction = yield transaction_service_1.TransactionServices.sendMoney(fromWallet._id, new mongoose_1.Types.ObjectId(fromUserId.toString()), new mongoose_1.Types.ObjectId(toUserId), amount);
+    const transaction = yield transaction_service_1.TransactionServices.sendMoney(fromWallet._id, fromUserId, toUserId, amount);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Money sent successfully",
@@ -63,18 +61,18 @@ const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
 }));
 // Withdraw money from wallet
 const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { amount } = req.body;
-    const user = req.user;
-    const userId = user === null || user === void 0 ? void 0 : user._id;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     if (!userId) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "User not authenticated");
     }
     // Get user's wallet
-    const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(new mongoose_1.Types.ObjectId(userId.toString()));
+    const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(userId);
     if (!wallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }
-    const transaction = yield transaction_service_1.TransactionServices.withdrawMoney(wallet._id, new mongoose_1.Types.ObjectId(userId.toString()), amount);
+    const transaction = yield transaction_service_1.TransactionServices.withdrawMoney(wallet._id, userId, amount);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Money withdrawn successfully",
@@ -83,15 +81,15 @@ const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
 }));
 // Get transaction history for current user
 const getMyTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = req.user;
-    const userId = user === null || user === void 0 ? void 0 : user._id;
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     if (!userId) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "User not authenticated");
     }
     // Get user's wallet
-    const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(new mongoose_1.Types.ObjectId(userId.toString()));
+    const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(userId);
     if (!wallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }
@@ -110,20 +108,20 @@ const getMyTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __awa
 }));
 // Get specific transaction by ID
 const getTransactionById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
     const { transactionId } = req.params;
-    const user = req.user;
-    const userId = user === null || user === void 0 ? void 0 : user._id;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     if (!userId) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "User not authenticated");
     }
-    const transaction = yield transaction_service_1.TransactionServices.getTransactionById(new mongoose_1.Types.ObjectId(transactionId));
+    const transaction = yield transaction_service_1.TransactionServices.getTransactionById(transactionId);
     if (!transaction) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Transaction not found");
     }
     // Check if user owns this transaction or is admin
     if (transaction.initiatedBy.toString() !== userId.toString() &&
-        (user === null || user === void 0 ? void 0 : user.role) !== "ADMIN" &&
-        (user === null || user === void 0 ? void 0 : user.role) !== "SUPER_ADMIN") {
+        ((_b = req.user) === null || _b === void 0 ? void 0 : _b.role) !== "ADMIN" &&
+        ((_c = req.user) === null || _c === void 0 ? void 0 : _c.role) !== "SUPER_ADMIN") {
         throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "Access denied");
     }
     res.status(http_status_codes_1.default.OK).json({

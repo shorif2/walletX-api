@@ -6,16 +6,6 @@ import { TransactionRoutes } from "../modules/transaction/transaction.route";
 
 export const router = Router();
 
-// Health check endpoint
-router.get("/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Wallet-X API is running successfully",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development",
-  });
-});
-
 const moduleRoutes = [
   {
     path: "/user",
