@@ -44,8 +44,8 @@ app.use(cors());
 app.use("/api/v1", router);
 
 app.get("/", async (req: Request, res: Response) => {
-  // res.sendFile(path.join(__dirname, "./app/ui/index.html"));
-  res.send("Hello from Wallet-X API!");
+  res.sendFile(path.join(__dirname, "./app/ui/index.html"));
+  // res.send("Hello from Wallet-X API!");
 });
 
 app.use(globalErrorHandler);
