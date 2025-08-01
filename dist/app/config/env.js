@@ -22,7 +22,6 @@ const loadEnvs = () => {
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "GOOGLE_CALLBACK_URL",
-        "GOOGLE_CLIENT_ID",
         "FRONTEND_URL",
     ];
     requiredEnv.forEach((key) => {
