@@ -31,7 +31,9 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.startServer = startServer;
-startServer();
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield startServer();
+}))();
 // handle unhandledRejection error
 process.on("unhandledRejection", (err) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Unhandled rejection", err);

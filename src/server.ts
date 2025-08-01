@@ -18,7 +18,9 @@ const startServer = async () => {
   }
 };
 
-startServer();
+(async () => {
+  await startServer();
+})();
 
 // handle unhandledRejection error
 process.on("unhandledRejection", async (err) => {
