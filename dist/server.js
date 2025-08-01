@@ -26,7 +26,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
+        console.log("error is here", error);
         process.exit(1);
     }
 });
@@ -34,42 +34,39 @@ exports.startServer = startServer;
 (() => __awaiter(void 0, void 0, void 0, function* () {
     yield startServer();
 }))();
-// handle unhandledRejection error
-process.on("unhandledRejection", (err) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Unhandled rejection", err);
+process.on("SIGTERM", () => {
+    console.log("SIGTERM signal recieved... Server shutting down..");
     if (server) {
         server.close(() => {
             process.exit(1);
         });
     }
     process.exit(1);
-}));
-// handle unhandledRejection error
-process.on("uncaughtException", (err) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("uncaughtException rejection", err);
+});
+process.on("SIGINT", () => {
+    console.log("SIGINT signal recieved... Server shutting down..");
     if (server) {
         server.close(() => {
             process.exit(1);
         });
     }
     process.exit(1);
-}));
-// handle unhandledRejection error
-process.on("SIGTERM", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("SIGTERM rejection");
+});
+process.on("unhandledRejection", (err) => {
+    console.log("Unhandled Rejecttion detected... Server shutting down..", err);
     if (server) {
         server.close(() => {
             process.exit(1);
         });
     }
     process.exit(1);
-}));
-process.on("SIGINT", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("SIGINT rejection");
+});
+process.on("uncaughtException", (err) => {
+    console.log("Uncaught Exception detected... Server shutting down..", err);
     if (server) {
         server.close(() => {
             process.exit(1);
         });
     }
     process.exit(1);
-}));
+});

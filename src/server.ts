@@ -13,7 +13,7 @@ const startServer = async () => {
       console.log(`Server is running on port ${envVars.PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    console.log("error is here", error);
     process.exit(1);
   }
 };
@@ -22,49 +22,51 @@ const startServer = async () => {
   await startServer();
 })();
 
-// handle unhandledRejection error
-process.on("unhandledRejection", async (err) => {
-  console.log("Unhandled rejection", err);
+process.on("SIGTERM", () => {
+  console.log("SIGTERM signal recieved... Server shutting down..");
 
   if (server) {
     server.close(() => {
       process.exit(1);
     });
   }
+
   process.exit(1);
 });
 
-// handle unhandledRejection error
-process.on("uncaughtException", async (err) => {
-  console.log("uncaughtException rejection", err);
+process.on("SIGINT", () => {
+  console.log("SIGINT signal recieved... Server shutting down..");
 
   if (server) {
     server.close(() => {
       process.exit(1);
     });
   }
+
   process.exit(1);
 });
 
-// handle unhandledRejection error
-process.on("SIGTERM", async () => {
-  console.log("SIGTERM rejection");
+process.on("unhandledRejection", (err) => {
+  console.log("Unhandled Rejecttion detected... Server shutting down..", err);
 
   if (server) {
     server.close(() => {
       process.exit(1);
     });
   }
+
   process.exit(1);
 });
-process.on("SIGINT", async () => {
-  console.log("SIGINT rejection");
+
+process.on("uncaughtException", (err) => {
+  console.log("Uncaught Exception detected... Server shutting down..", err);
 
   if (server) {
     server.close(() => {
       process.exit(1);
     });
   }
+
   process.exit(1);
 });
 
