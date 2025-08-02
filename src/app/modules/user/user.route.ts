@@ -6,10 +6,6 @@ import { Role } from "./user.types";
 const router = Router();
 
 router.post("/register", UserControllers.createUser);
-router.get(
-  "/all-users",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-  UserControllers.getAllUsers
-);
+router.get("/all-users", checkAuth(Role.ADMIN), UserControllers.getAllUsers);
 
 export const UserRoutes = router;

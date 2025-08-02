@@ -7,10 +7,20 @@ import {
 
 const TransactionSchema = new Schema<ITransaction>(
   {
-    walletId: {
-      type: Schema.Types.ObjectId,
-      ref: "Wallet",
-      required: true,
+    senderWallet: {
+      type: String,
+      required: function (this: ITransaction) {
+        return this.type === TransactionType.SEND;
+      },
+    },
+    walletNumber: {
+      type: String,
+      required: function (this: ITransaction) {
+        return (
+          this.type === TransactionType.ADD ||
+          this.type === TransactionType.WITHDRAW
+        );
+      },
     },
     type: {
       type: String,
@@ -22,12 +32,14 @@ const TransactionSchema = new Schema<ITransaction>(
       ref: "User",
       required: true,
     },
-    toWalletId: {
-      type: Schema.Types.ObjectId,
-      ref: "Wallet",
+    recieverWallet: {
+      type: String,
       required: function (this: ITransaction) {
         return this.type === TransactionType.SEND;
       },
+    },
+    note: {
+      type: String,
     },
     amount: {
       type: Number,

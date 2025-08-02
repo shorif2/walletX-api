@@ -10,6 +10,13 @@ const walletSchema = new mongoose_1.Schema({
         required: true,
         unique: true,
     },
+    walletNumber: {
+        type: String,
+        required: true,
+        unique: true,
+        minlength: 10,
+        maxlength: 16,
+    },
     balance: {
         type: Number,
         default: 50,

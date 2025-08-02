@@ -60,7 +60,13 @@ const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
         },
     };
 });
+// Get user by ID
+const getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.findById(userId);
+    return user;
+});
 exports.UserServices = {
     createUser,
     getAllUsers,
+    getUserById,
 };

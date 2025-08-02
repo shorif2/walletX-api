@@ -5,6 +5,7 @@ import { IUser } from "./user.types";
 import bcryptjs from "bcryptjs";
 import httpStatus from "http-status-codes";
 import { WalletServices } from "../wallet/wallet.service";
+import { Types } from "mongoose";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
@@ -48,7 +49,14 @@ const getAllUsers = async () => {
   };
 };
 
+// Get user by ID
+const getUserById = async (userId: Types.ObjectId) => {
+  const user = await User.findById(userId);
+  return user;
+};
+
 export const UserServices = {
   createUser,
   getAllUsers,
+  getUserById,
 };

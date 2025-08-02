@@ -12,13 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkAuth = void 0;
+exports.checkAuthAndAgent = exports.checkAuth = void 0;
 const env_1 = require("../config/env");
 const AppError_1 = __importDefault(require("../errorHelpers/AppError"));
 const user_model_1 = require("../modules/user/user.model");
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const user_types_1 = require("../modules/user/user.types");
 const jwt_1 = require("../utils/jwt");
+const agent_model_1 = require("../modules/agent/agent.model");
+const agent_types_1 = require("../modules/agent/agent.types");
 const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accessToken = req.headers.authorization;
@@ -39,6 +41,7 @@ const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0
         if (isUserExist.isBlocked) {
             throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User is Blocked");
         }
+        console.log(authRoles, verifiedToken.role);
         if (!authRoles.includes(verifiedToken.role)) {
             throw new AppError_1.default(403, "You are not permitted to view this route!!!");
         }
@@ -51,3 +54,31 @@ const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0
     }
 });
 exports.checkAuth = checkAuth;
+const checkAuthAndAgent = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const accessToken = req.headers.authorization;
+        if (!accessToken) {
+            throw new AppError_1.default(403, "No Token Recieved");
+        }
+        const verifiedToken = (0, jwt_1.verifyToken)(accessToken, env_1.envVars.JWT_ACCESS_SECRET);
+        const isUserExist = yield agent_model_1.Agent.findOne({
+            email: verifiedToken.email,
+        }).select(["-createdAt", "-updatedAt"]);
+        if (!isUserExist) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User does not exist");
+        }
+        if (isUserExist.status === agent_types_1.AgentStatus.SUSPENDED) {
+            throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `Agent is ${isUserExist.status}`);
+        }
+        if (!authRoles.includes(verifiedToken.role)) {
+            throw new AppError_1.default(403, "You are not permitted to view this route!!!");
+        }
+        req.user = isUserExist;
+        next();
+    }
+    catch (error) {
+        console.log("jwt error", error);
+        next(error);
+    }
+});
+exports.checkAuthAndAgent = checkAuthAndAgent;

@@ -42,7 +42,7 @@ const addMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, vo
 // Send money to another user
 const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { toUserId, amount } = req.body;
+    const { recieverWallet, amount, note } = req.body;
     const fromUserId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     if (!fromUserId) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "User not authenticated");
@@ -52,7 +52,7 @@ const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
     if (!fromWallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Sender wallet not found");
     }
-    const transaction = yield transaction_service_1.TransactionServices.sendMoney(fromWallet._id, fromUserId, toUserId, amount);
+    const transaction = yield transaction_service_1.TransactionServices.sendMoney(fromWallet._id, fromUserId, recieverWallet, amount, note);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Money sent successfully",
@@ -62,7 +62,7 @@ const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
 // Withdraw money from wallet
 const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { amount } = req.body;
+    const { amount, note } = req.body;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     if (!userId) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "User not authenticated");
@@ -72,7 +72,7 @@ const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
     if (!wallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }
-    const transaction = yield transaction_service_1.TransactionServices.withdrawMoney(wallet._id, userId, amount);
+    const transaction = yield transaction_service_1.TransactionServices.withdrawMoney(userId, amount, note);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Money withdrawn successfully",
@@ -149,10 +149,42 @@ const getAllTransactions = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(
         },
     });
 }));
+// Agent cash-in: Add money to any user's wallet
+const agentCashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { walletNumber, amount, note } = req.body;
+    const agentId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+    if (!agentId) {
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Agent not authenticated");
+    }
+    const transaction = yield transaction_service_1.TransactionServices.agentCashIn(agentId, walletNumber, amount, note);
+    res.status(http_status_codes_1.default.CREATED).json({
+        success: true,
+        message: "Agent cash-in completed successfully",
+        data: transaction,
+    });
+}));
+// Agent cash-out: Withdraw money from any user's wallet
+const agentCashOut = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { walletNumber, amount, note } = req.body;
+    const agentId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+    if (!agentId) {
+        throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Agent not authenticated");
+    }
+    const transaction = yield transaction_service_1.TransactionServices.agentCashOut(agentId, walletNumber, amount, note);
+    res.status(http_status_codes_1.default.CREATED).json({
+        success: true,
+        message: "Agent cash-out completed successfully",
+        data: transaction,
+    });
+}));
 exports.TransactionController = {
     addMoney,
     sendMoney,
     withdrawMoney,
+    agentCashIn,
+    agentCashOut,
     getMyTransactionHistory,
     getTransactionById,
     getAllTransactions,

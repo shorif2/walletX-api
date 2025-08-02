@@ -33,51 +33,52 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Transaction = void 0;
+exports.Agent = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const transaction_types_1 = require("./transaction.types");
-const TransactionSchema = new mongoose_1.Schema({
-    senderWallet: {
+const agent_types_1 = require("./agent.types");
+const agentSchema = new mongoose_1.Schema({
+    name: {
         type: String,
-        required: function () {
-            return this.type === transaction_types_1.TransactionType.SEND;
-        },
-    },
-    walletNumber: {
-        type: String,
-        required: function () {
-            return (this.type === transaction_types_1.TransactionType.ADD ||
-                this.type === transaction_types_1.TransactionType.WITHDRAW);
-        },
-    },
-    type: {
-        type: String,
-        enum: Object.values(transaction_types_1.TransactionType),
         required: true,
     },
-    initiatedBy: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-    recieverWallet: {
+    email: {
         type: String,
-        required: function () {
-            return this.type === transaction_types_1.TransactionType.SEND;
-        },
-    },
-    note: {
-        type: String,
-    },
-    amount: {
-        type: Number,
         required: true,
-        min: 10,
+        unique: true,
+    },
+    password: {
+        type: String,
+        required: true,
+        minlength: 6,
+    },
+    role: {
+        type: String,
+        default: "AGENT",
     },
     status: {
         type: String,
-        enum: Object.values(transaction_types_1.TransactionStatus),
-        default: transaction_types_1.TransactionStatus.PENDING,
+        enum: Object.values(agent_types_1.AgentStatus),
+        default: agent_types_1.AgentStatus.APPROVED,
     },
-}, { timestamps: true, versionKey: false });
-exports.Transaction = mongoose_1.default.model("Transaction", TransactionSchema);
+    totalTransactions: {
+        type: Number,
+        default: 0,
+        min: 0,
+    },
+    createdBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    suspendedBy: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    suspensionReason: {
+        type: String,
+        trim: true,
+    },
+}, {
+    timestamps: true,
+    versionKey: false,
+});
+exports.Agent = mongoose_1.default.model("Agent", agentSchema);

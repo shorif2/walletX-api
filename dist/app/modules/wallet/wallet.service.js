@@ -11,9 +11,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WalletServices = void 0;
 const wallet_model_1 = require("./wallet.model");
+const walletNumberGenerator_1 = require("../../utils/walletNumberGenerator");
 const createWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    // Generate a unique wallet number
+    const walletNumber = yield (0, walletNumberGenerator_1.generateWalletNumber)();
     const wallet = yield wallet_model_1.Wallet.create({
         userId,
+        walletNumber,
         balance: 50, // Default balance as per model
         isBlocked: false, // Default to not blocked
     });
@@ -25,6 +29,10 @@ const getWalletByUserId = (userId) => __awaiter(void 0, void 0, void 0, function
 });
 const getWalletById = (walletId) => __awaiter(void 0, void 0, void 0, function* () {
     const wallet = yield wallet_model_1.Wallet.findById(walletId);
+    return wallet;
+});
+const getWalletByWalletNumber = (walletNumber) => __awaiter(void 0, void 0, void 0, function* () {
+    const wallet = yield wallet_model_1.Wallet.findOne({ walletNumber });
     return wallet;
 });
 const updateWalletBalance = (userId, amount) => __awaiter(void 0, void 0, void 0, function* () {
@@ -43,6 +51,7 @@ exports.WalletServices = {
     createWallet,
     getWalletByUserId,
     getWalletById,
+    getWalletByWalletNumber,
     updateWalletBalance,
     blockWallet,
     unblockWallet,

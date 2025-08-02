@@ -57,6 +57,18 @@ const blockWallet = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: wallet,
     });
 }));
+const getWalletByWalletNumber = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { walletNumber } = req.params;
+    const wallet = yield wallet_service_1.WalletServices.getWalletByWalletNumber(walletNumber);
+    if (!wallet) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
+    }
+    res.status(http_status_codes_1.default.OK).json({
+        success: true,
+        message: "Wallet retrieved successfully",
+        data: wallet,
+    });
+}));
 const unblockWallet = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.params;
     const wallet = yield wallet_service_1.WalletServices.unblockWallet(userId);
@@ -71,6 +83,7 @@ const unblockWallet = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 
 }));
 exports.WalletController = {
     getWalletByUserId,
+    getWalletByWalletNumber,
     updateWalletBalance,
     blockWallet,
     unblockWallet,

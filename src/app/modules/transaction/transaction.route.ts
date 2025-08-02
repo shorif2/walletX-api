@@ -1,6 +1,6 @@
 import express from "express";
 import { TransactionController } from "./transaction.controller";
-import { checkAuth } from "../../middlewares/checkAuth";
+import { checkAuth, checkAuthAndAgent } from "../../middlewares/checkAuth";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { transactionValidation } from "./transaction.validation";
 
@@ -9,7 +9,7 @@ const router = express.Router();
 // Add money to wallet
 router.post(
   "/add",
-  checkAuth("USER", "ADMIN", "SUPER_ADMIN", "AGENT"),
+  checkAuth("USER"),
   validateRequest(transactionValidation.addMoney),
   TransactionController.addMoney
 );
@@ -17,7 +17,7 @@ router.post(
 // Send money to another user
 router.post(
   "/send",
-  checkAuth("USER", "ADMIN", "SUPER_ADMIN", "AGENT"),
+  checkAuth("USER"),
   validateRequest(transactionValidation.sendMoney),
   TransactionController.sendMoney
 );
@@ -25,22 +25,38 @@ router.post(
 // Withdraw money from wallet
 router.post(
   "/withdraw",
-  checkAuth("USER", "ADMIN", "SUPER_ADMIN", "AGENT"),
+  checkAuth("USER"),
   validateRequest(transactionValidation.withdrawMoney),
   TransactionController.withdrawMoney
+);
+
+// Agent cash-in: Add money to any user's wallet
+router.post(
+  "/cash-in",
+  checkAuthAndAgent("AGENT"),
+  validateRequest(transactionValidation.agentCashIn),
+  TransactionController.agentCashIn
+);
+
+// Agent cash-out: Withdraw money from any user's wallet
+router.post(
+  "/cash-out",
+  checkAuthAndAgent("AGENT"),
+  validateRequest(transactionValidation.agentCashOut),
+  TransactionController.agentCashOut
 );
 
 // Get my transaction history
 router.get(
   "/my-history",
-  checkAuth("USER", "ADMIN", "SUPER_ADMIN", "AGENT"),
+  checkAuth("USER"),
   TransactionController.getMyTransactionHistory
 );
 
 // Get specific transaction by ID
 router.get(
   "/:transactionId",
-  checkAuth("USER", "ADMIN", "SUPER_ADMIN", "AGENT"),
+  checkAuth("USER", "ADMIN"),
   TransactionController.getTransactionById
 );
 

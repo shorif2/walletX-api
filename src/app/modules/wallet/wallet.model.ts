@@ -11,6 +11,13 @@ const walletSchema = new Schema<IWallet>(
       required: true,
       unique: true,
     },
+    walletNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      minlength: 10,
+      maxlength: 16,
+    },
     balance: {
       type: Number,
       default: 50,

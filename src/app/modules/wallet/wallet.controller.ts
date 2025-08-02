@@ -60,6 +60,24 @@ const blockWallet = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getWalletByWalletNumber = catchAsync(
+  async (req: Request, res: Response) => {
+    const { walletNumber } = req.params;
+
+    const wallet = await WalletServices.getWalletByWalletNumber(walletNumber);
+
+    if (!wallet) {
+      throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
+    }
+
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Wallet retrieved successfully",
+      data: wallet,
+    });
+  }
+);
+
 const unblockWallet = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params;
 
@@ -78,6 +96,7 @@ const unblockWallet = catchAsync(async (req: Request, res: Response) => {
 
 export const WalletController = {
   getWalletByUserId,
+  getWalletByWalletNumber,
   updateWalletBalance,
   blockWallet,
   unblockWallet,

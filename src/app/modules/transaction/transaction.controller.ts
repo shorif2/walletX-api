@@ -5,6 +5,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 import { WalletServices } from "../wallet/wallet.service";
+import { Types } from "mongoose";
 
 // id issue here
 
@@ -38,7 +39,7 @@ const addMoney = catchAsync(async (req: Request, res: Response) => {
 
 // Send money to another user
 const sendMoney = catchAsync(async (req: Request, res: Response) => {
-  const { toUserId, amount } = req.body;
+  const { recieverWallet, amount, note } = req.body;
   const fromUserId = req.user?._id;
 
   if (!fromUserId) {
@@ -54,8 +55,9 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
   const transaction = await TransactionServices.sendMoney(
     fromWallet._id as any,
     fromUserId as any,
-    toUserId as any,
-    amount
+    recieverWallet,
+    amount,
+    note as any
   );
 
   res.status(httpStatus.CREATED).json({
@@ -67,7 +69,7 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
 
 // Withdraw money from wallet
 const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
-  const { amount } = req.body;
+  const { amount, note } = req.body;
   const userId = req.user?._id;
 
   if (!userId) {
@@ -81,9 +83,9 @@ const withdrawMoney = catchAsync(async (req: Request, res: Response) => {
   }
 
   const transaction = await TransactionServices.withdrawMoney(
-    wallet._id as any,
     userId as any,
-    amount
+    amount,
+    note as any
   );
 
   res.status(httpStatus.CREATED).json({
@@ -190,10 +192,58 @@ const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Agent cash-in: Add money to any user's wallet
+const agentCashIn = catchAsync(async (req: Request, res: Response) => {
+  const { walletNumber, amount, note } = req.body;
+  const agentId = req.user?._id;
+
+  if (!agentId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Agent not authenticated");
+  }
+
+  const transaction = await TransactionServices.agentCashIn(
+    agentId as any,
+    walletNumber as any,
+    amount,
+    note
+  );
+
+  res.status(httpStatus.CREATED).json({
+    success: true,
+    message: "Agent cash-in completed successfully",
+    data: transaction,
+  });
+});
+
+// Agent cash-out: Withdraw money from any user's wallet
+const agentCashOut = catchAsync(async (req: Request, res: Response) => {
+  const { walletNumber, amount, note } = req.body;
+  const agentId = req.user?._id;
+
+  if (!agentId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Agent not authenticated");
+  }
+
+  const transaction = await TransactionServices.agentCashOut(
+    agentId as any,
+    walletNumber as any,
+    amount,
+    note
+  );
+
+  res.status(httpStatus.CREATED).json({
+    success: true,
+    message: "Agent cash-out completed successfully",
+    data: transaction,
+  });
+});
+
 export const TransactionController = {
   addMoney,
   sendMoney,
   withdrawMoney,
+  agentCashIn,
+  agentCashOut,
   getMyTransactionHistory,
   getTransactionById,
   getAllTransactions,

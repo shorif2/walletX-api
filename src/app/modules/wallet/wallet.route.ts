@@ -8,9 +8,16 @@ const router = express.Router();
 
 // Get wallet by user ID
 router.get(
-  "/:userId",
-  checkAuth("USER", "ADMIN", "SUPER_ADMIN", "AGENT"),
+  "/user/:userId",
+  checkAuth("USER", "ADMIN"),
   WalletController.getWalletByUserId
+);
+
+// Get wallet by wallet number
+router.get(
+  "/:walletNumber",
+  checkAuth("USER", "ADMIN"),
+  WalletController.getWalletByWalletNumber
 );
 
 // Update wallet balance
@@ -24,14 +31,14 @@ router.patch(
 // Block wallet
 router.patch(
   "/:userId/block",
-  checkAuth("ADMIN", "SUPER_ADMIN"),
+  checkAuth("ADMIN"),
   WalletController.blockWallet
 );
 
 // Unblock wallet
 router.patch(
   "/:userId/unblock",
-  checkAuth("ADMIN", "SUPER_ADMIN"),
+  checkAuth("ADMIN"),
   WalletController.unblockWallet
 );
 

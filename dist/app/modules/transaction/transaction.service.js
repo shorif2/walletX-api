@@ -16,10 +16,11 @@ exports.TransactionServices = void 0;
 const transaction_model_1 = require("./transaction.model");
 const transaction_types_1 = require("./transaction.types");
 const wallet_service_1 = require("../wallet/wallet.service");
+const user_service_1 = require("../user/user.service");
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 // Add money to wallet
-const addMoney = (walletId, userId, amount) => __awaiter(void 0, void 0, void 0, function* () {
+const addMoney = (senderWallet, userId, amount) => __awaiter(void 0, void 0, void 0, function* () {
     // Validate amount
     if (amount < 10) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Minimum amount is 10");
@@ -34,7 +35,7 @@ const addMoney = (walletId, userId, amount) => __awaiter(void 0, void 0, void 0,
     }
     // Create transaction
     const transaction = yield transaction_model_1.Transaction.create({
-        walletId,
+        senderWallet,
         type: transaction_types_1.TransactionType.ADD,
         initiatedBy: userId,
         amount,
@@ -47,14 +48,11 @@ const addMoney = (walletId, userId, amount) => __awaiter(void 0, void 0, void 0,
     return transaction;
 });
 // Send money to another wallet
-const sendMoney = (fromWalletId, fromUserId, toUserId, amount) => __awaiter(void 0, void 0, void 0, function* () {
+const sendMoney = (fromWalletId, fromUserId, recieverWallet, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     // Validate amount
     if (amount < 10) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Minimum amount is 10");
-    }
-    // Check if sender and receiver are different
-    if (fromUserId.toString() === toUserId.toString()) {
-        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Cannot send money to yourself");
     }
     // Check if sender wallet exists and is not blocked
     const fromWallet = yield wallet_service_1.WalletServices.getWalletByUserId(fromUserId);
@@ -69,31 +67,40 @@ const sendMoney = (fromWalletId, fromUserId, toUserId, amount) => __awaiter(void
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Insufficient balance");
     }
     // Check if receiver wallet exists and is not blocked
-    const toWallet = yield wallet_service_1.WalletServices.getWalletByUserId(toUserId);
+    const toWallet = yield wallet_service_1.WalletServices.getWalletByWalletNumber(recieverWallet);
     if (!toWallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Receiver wallet not found");
     }
     if (toWallet.isBlocked) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Receiver wallet is blocked");
     }
+    // Check if sender and receiver are different
+    if (((_a = fromWallet._id) === null || _a === void 0 ? void 0 : _a.toString()) === ((_b = toWallet._id) === null || _b === void 0 ? void 0 : _b.toString())) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Cannot send money to yourself");
+    }
+    // Ensure wallet IDs exist
+    if (!toWallet._id || !toWallet.userId) {
+        throw new AppError_1.default(http_status_codes_1.default.INTERNAL_SERVER_ERROR, "Invalid wallet data");
+    }
     // Create transaction
     const transaction = yield transaction_model_1.Transaction.create({
-        walletId: fromWalletId,
+        senderWallet: fromWallet.walletNumber,
         type: transaction_types_1.TransactionType.SEND,
         initiatedBy: fromUserId,
-        toWalletId: toWallet._id,
+        recieverWallet: recieverWallet,
         amount,
-        status: transaction_types_1.TransactionStatus.PENDING,
+        status: transaction_types_1.TransactionStatus.COMPLETED,
+        note,
     });
     // Update both wallet balances
     yield wallet_service_1.WalletServices.updateWalletBalance(fromUserId, -amount);
-    yield wallet_service_1.WalletServices.updateWalletBalance(toUserId, amount);
-    // Update transaction status to completed
-    yield transaction_model_1.Transaction.findByIdAndUpdate(transaction._id, { status: transaction_types_1.TransactionStatus.COMPLETED }, { new: true });
+    yield wallet_service_1.WalletServices.updateWalletBalance(toWallet.userId, amount);
     return transaction;
 });
 // Withdraw money from wallet
-const withdrawMoney = (walletId, userId, amount) => __awaiter(void 0, void 0, void 0, function* () {
+const withdrawMoney = (
+// walletId: Types.ObjectId,
+userId, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
     // Validate amount
     if (amount < 10) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Minimum amount is 10");
@@ -112,16 +119,89 @@ const withdrawMoney = (walletId, userId, amount) => __awaiter(void 0, void 0, vo
     }
     // Create transaction
     const transaction = yield transaction_model_1.Transaction.create({
-        walletId,
+        walletNumber: wallet.walletNumber,
         type: transaction_types_1.TransactionType.WITHDRAW,
         initiatedBy: userId,
         amount,
-        status: transaction_types_1.TransactionStatus.PENDING,
+        status: transaction_types_1.TransactionStatus.COMPLETED,
+        note,
     });
     // Update wallet balance
     yield wallet_service_1.WalletServices.updateWalletBalance(userId, -amount);
-    // Update transaction status to completed
-    yield transaction_model_1.Transaction.findByIdAndUpdate(transaction._id, { status: transaction_types_1.TransactionStatus.COMPLETED }, { new: true });
+    return transaction;
+});
+// Agent cash-in: Add money to any user's wallet
+const agentCashIn = (agentId, walletNumber, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
+    // Validate amount
+    if (amount < 10) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Minimum amount is 10");
+    }
+    // Verify agent exists and has AGENT role
+    const agent = yield user_service_1.UserServices.getUserById(agentId);
+    if (!agent) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Agent not found");
+    }
+    if (agent.role !== "AGENT") {
+        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "Only agents can perform this operation");
+    }
+    // Check if target user's wallet exists and is not blocked
+    const wallet = yield wallet_service_1.WalletServices.getWalletByWalletNumber(walletNumber);
+    if (!wallet) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Target user's wallet not found");
+    }
+    if (wallet.isBlocked) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Target user's wallet is blocked");
+    }
+    // Create transaction
+    const transaction = yield transaction_model_1.Transaction.create({
+        walletNumber: wallet.walletNumber,
+        type: transaction_types_1.TransactionType.CASH_IN,
+        initiatedBy: agentId,
+        amount,
+        status: transaction_types_1.TransactionStatus.COMPLETED,
+        note: note ? `Agent cash-in: ${note}` : "Agent cash-in",
+    });
+    // Update wallet balance
+    yield wallet_service_1.WalletServices.updateWalletBalance(wallet.userId, amount);
+    return transaction;
+});
+// Agent cash-out: Withdraw money from any user's wallet
+const agentCashOut = (agentId, walletNumber, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
+    // Validate amount
+    if (amount < 10) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Minimum amount is 10");
+    }
+    // Verify agent exists and has AGENT role
+    const agent = yield user_service_1.UserServices.getUserById(agentId);
+    if (!agent) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Agent not found");
+    }
+    if (agent.role !== "AGENT") {
+        throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "Only agents can perform this operation");
+    }
+    // Check if target user's wallet exists and is not blocked
+    const wallet = yield wallet_service_1.WalletServices.getWalletByWalletNumber(walletNumber);
+    if (!wallet) {
+        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Target user's wallet not found");
+    }
+    if (wallet.isBlocked) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Target user's wallet is blocked");
+    }
+    // Check if user has sufficient balance
+    if ((wallet.balance || 0) < amount) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Insufficient balance in target user's wallet");
+    }
+    // Create transaction
+    const transaction = yield transaction_model_1.Transaction.create({
+        walletNumber: wallet.walletNumber,
+        type: transaction_types_1.TransactionType.CASH_OUT,
+        initiatedBy: agentId,
+        amount,
+        status: transaction_types_1.TransactionStatus.COMPLETED,
+        note: note ? `Agent cash-out: ${note}` : "Agent cash-out",
+    });
+    // Update wallet balance
+    yield wallet_service_1.WalletServices.updateWalletBalance(wallet.userId, -amount);
     return transaction;
 });
 // Get transaction history for a wallet
@@ -176,6 +256,8 @@ exports.TransactionServices = {
     addMoney,
     sendMoney,
     withdrawMoney,
+    agentCashIn,
+    agentCashOut,
     getTransactionHistory,
     getTransactionById,
     getAllTransactions,

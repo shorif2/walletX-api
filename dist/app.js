@@ -22,6 +22,7 @@ const globalErrorHandler_1 = require("./app/middlewares/globalErrorHandler");
 const notFound_1 = __importDefault(require("./app/middlewares/notFound"));
 const passport_1 = __importDefault(require("passport"));
 require("./app/config/passport");
+const path_1 = __importDefault(require("path"));
 const connect_mongo_1 = __importDefault(require("connect-mongo"));
 const app = (0, express_1.default)();
 // Session configuration with production-ready store
@@ -51,8 +52,8 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use("/api/v1", routes_1.router);
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // res.sendFile(path.join(__dirname, "./app/ui/index.html"));
-    res.send("Hello from Wallet-X API!");
+    res.sendFile(path_1.default.join(__dirname, "./app/ui/index.html"));
+    // res.send("Hello from Wallet-X API!");
 }));
 app.use(globalErrorHandler_1.globalErrorHandler);
 app.use(notFound_1.default);

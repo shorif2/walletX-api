@@ -6,6 +6,8 @@ var TransactionType;
     TransactionType["ADD"] = "add";
     TransactionType["WITHDRAW"] = "withdraw";
     TransactionType["SEND"] = "send";
+    TransactionType["CASH_IN"] = "cash-in";
+    TransactionType["CASH_OUT"] = "cash-out";
 })(TransactionType || (exports.TransactionType = TransactionType = {}));
 var TransactionStatus;
 (function (TransactionStatus) {
