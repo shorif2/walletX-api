@@ -41,24 +41,28 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const hashedPassword = yield bcryptjs_1.default.hash(password, Number(env_1.envVars.BCRYPT_SALT_ROUND));
     const user = yield user_model_1.User.create(Object.assign({ email, password: hashedPassword }, rest));
     // Automatically create wallet for the new user
-    let wallet;
     try {
-        wallet = yield wallet_service_1.WalletServices.createWallet(user._id);
+        const wallet = yield wallet_service_1.WalletServices.createWallet(user._id);
         // Update user with wallet reference
-        yield user_model_1.User.findByIdAndUpdate(user._id, { wallet: wallet._id });
-        // Update the user object to include wallet reference
-        user.wallet = wallet._id;
+        const updateUser = yield user_model_1.User.findByIdAndUpdate(user._id, {
+            wallet: wallet._id,
+        }, { new: true }).select("-password -updatedAt");
+        return updateUser;
     }
     catch (error) {
-        // If wallet creation fails, we should handle it appropriately
+        // If wallet creation fails,  throw an error
         // For now, we'll log the error but not fail the user creation
         console.error("Failed to create wallet for user:", user._id, error);
     }
-    return user;
 });
 //get all users
 const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_model_1.User.find({}).populate("wallet");
+    const users = yield user_model_1.User.find({})
+        .populate({
+        path: "wallet",
+        select: ["walletNumber", "balance", "isBlocked", "-_id"],
+    })
+        .select("-password -updatedAt");
     const totalUsers = yield user_model_1.User.countDocuments();
     return {
         data: users,

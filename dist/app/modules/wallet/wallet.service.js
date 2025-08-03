@@ -24,7 +24,12 @@ const createWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () 
     return wallet;
 });
 const getWalletByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOne({ user: userId });
+    const wallet = yield wallet_model_1.Wallet.findOne({ user: userId })
+        .populate({
+        path: "user",
+        select: ["name", "email", "role", "isBlocked"],
+    })
+        .select(["-createdAt"]);
     return wallet;
 });
 const getWalletById = (walletId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -55,11 +60,21 @@ const updateWalletBalance = (identifier, amount) => __awaiter(void 0, void 0, vo
     return wallet;
 });
 const blockWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ user: userId }, { isBlocked: true }, { new: true });
+    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ user: userId }, { isBlocked: true }, { new: true })
+        .populate({
+        path: "user",
+        select: ["name", "email", "role", "isBlocked"],
+    })
+        .select(["-updatedAt"]);
     return wallet;
 });
 const unblockWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ user: userId }, { isBlocked: false }, { new: true });
+    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ user: userId }, { isBlocked: false }, { new: true })
+        .populate({
+        path: "user",
+        select: ["name", "email", "role", "isBlocked"],
+    })
+        .select(["-updatedAt"]);
     return wallet;
 });
 exports.WalletServices = {

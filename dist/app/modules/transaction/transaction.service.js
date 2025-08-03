@@ -30,21 +30,17 @@ const addMoney = (senderWallet, userId, amount) => __awaiter(void 0, void 0, voi
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }
     if (wallet.isBlocked) {
-        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Wallet is blocked");
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "This wallet is blocked");
     }
     // Create transaction
     const transaction = yield transaction_model_1.Transaction.create({
-        senderWallet,
-        walletNumber: wallet.walletNumber,
         type: transaction_types_1.TransactionType.ADD,
         initiatedBy: userId,
         amount,
-        status: transaction_types_1.TransactionStatus.PENDING,
+        status: transaction_types_1.TransactionStatus.COMPLETED,
     });
     // Update wallet balance
     yield wallet_service_1.WalletServices.updateWalletBalance(userId, amount);
-    // Update transaction status to completed
-    yield transaction_model_1.Transaction.findByIdAndUpdate(transaction._id, { status: transaction_types_1.TransactionStatus.COMPLETED }, { new: true });
     return transaction;
 });
 // Send money to another wallet
@@ -119,7 +115,6 @@ userId, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // Create transaction
     const transaction = yield transaction_model_1.Transaction.create({
-        walletNumber: wallet.walletNumber,
         type: transaction_types_1.TransactionType.WITHDRAW,
         initiatedBy: userId,
         amount,

@@ -28,28 +28,32 @@ const createUser = async (payload: Partial<IUser>) => {
     password: hashedPassword,
     ...rest,
   });
-
   // Automatically create wallet for the new user
-  let wallet;
   try {
-    wallet = await WalletServices.createWallet(user._id);
-
+    const wallet = await WalletServices.createWallet(user._id);
     // Update user with wallet reference
-    await User.findByIdAndUpdate(user._id, { wallet: wallet._id });
-
-    // Update the user object to include wallet reference
-    user.wallet = wallet._id;
+    const updateUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        wallet: wallet._id,
+      },
+      { new: true }
+    ).select("-password -updatedAt");
+    return updateUser as IUser;
   } catch (error) {
-    // If wallet creation fails, we should handle it appropriately
+    // If wallet creation fails,  throw an error
     // For now, we'll log the error but not fail the user creation
     console.error("Failed to create wallet for user:", user._id, error);
   }
-
-  return user;
 };
 //get all users
 const getAllUsers = async () => {
-  const users = await User.find({}).populate("wallet");
+  const users = await User.find({})
+    .populate({
+      path: "wallet",
+      select: ["walletNumber", "balance", "isBlocked", "-_id"],
+    })
+    .select("-password -updatedAt");
   const totalUsers = await User.countDocuments();
   return {
     data: users,

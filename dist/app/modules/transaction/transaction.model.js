@@ -40,14 +40,16 @@ const TransactionSchema = new mongoose_1.Schema({
     senderWallet: {
         type: String,
         required: function () {
-            return this.type === transaction_types_1.TransactionType.SEND;
+            return (this.type === transaction_types_1.TransactionType.SEND ||
+                this.type === transaction_types_1.TransactionType.CASH_IN ||
+                this.type === transaction_types_1.TransactionType.CASH_OUT);
         },
     },
     walletNumber: {
         type: String,
         required: function () {
-            return (this.type === transaction_types_1.TransactionType.ADD ||
-                this.type === transaction_types_1.TransactionType.WITHDRAW);
+            return (this.type === transaction_types_1.TransactionType.CASH_IN ||
+                this.type === transaction_types_1.TransactionType.CASH_OUT);
         },
     },
     type: {
@@ -68,6 +70,11 @@ const TransactionSchema = new mongoose_1.Schema({
     },
     note: {
         type: String,
+        required: function () {
+            return (this.type === transaction_types_1.TransactionType.WITHDRAW ||
+                this.type === transaction_types_1.TransactionType.CASH_OUT ||
+                this.type === transaction_types_1.TransactionType.SEND);
+        },
     },
     amount: {
         type: Number,

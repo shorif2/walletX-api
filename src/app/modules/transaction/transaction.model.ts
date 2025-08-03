@@ -10,15 +10,19 @@ const TransactionSchema = new Schema<ITransaction>(
     senderWallet: {
       type: String,
       required: function (this: ITransaction) {
-        return this.type === TransactionType.SEND;
+        return (
+          this.type === TransactionType.SEND ||
+          this.type === TransactionType.CASH_IN ||
+          this.type === TransactionType.CASH_OUT
+        );
       },
     },
     walletNumber: {
       type: String,
       required: function (this: ITransaction) {
         return (
-          this.type === TransactionType.ADD ||
-          this.type === TransactionType.WITHDRAW
+          this.type === TransactionType.CASH_IN ||
+          this.type === TransactionType.CASH_OUT
         );
       },
     },
@@ -40,6 +44,13 @@ const TransactionSchema = new Schema<ITransaction>(
     },
     note: {
       type: String,
+      required: function (this: ITransaction) {
+        return (
+          this.type === TransactionType.WITHDRAW ||
+          this.type === TransactionType.CASH_OUT ||
+          this.type === TransactionType.SEND
+        );
+      },
     },
     amount: {
       type: Number,

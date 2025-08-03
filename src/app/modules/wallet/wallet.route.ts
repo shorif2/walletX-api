@@ -16,7 +16,7 @@ router.get(
 // Get wallet by wallet number
 router.get(
   "/:walletNumber",
-  checkAuth("USER", "ADMIN"),
+  checkAuth("ADMIN"),
   WalletController.getWalletByWalletNumber
 );
 

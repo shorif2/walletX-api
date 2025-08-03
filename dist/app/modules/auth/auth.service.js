@@ -27,7 +27,7 @@ const getNewAccessToken = (refreshToken) => __awaiter(void 0, void 0, void 0, fu
     };
 });
 const resetPassword = (oldPassword, newPassword, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.findById(decodedToken.userId);
+    const user = yield user_model_1.User.findById(decodedToken._id);
     const isOldPasswordMatch = yield bcryptjs_1.default.compare(oldPassword, user.password);
     if (!isOldPasswordMatch) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Old Password does not match");

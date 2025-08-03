@@ -13,7 +13,7 @@ const router = express_1.default.Router();
 // Get wallet by user ID
 router.get("/user/:userId", (0, checkAuth_1.checkAuth)("USER", "ADMIN"), wallet_controller_1.WalletController.getWalletByUserId);
 // Get wallet by wallet number
-router.get("/:walletNumber", (0, checkAuth_1.checkAuth)("USER", "ADMIN"), wallet_controller_1.WalletController.getWalletByWalletNumber);
+router.get("/:walletNumber", (0, checkAuth_1.checkAuth)("ADMIN"), wallet_controller_1.WalletController.getWalletByWalletNumber);
 // Update wallet balance
 router.patch("/:userId/balance", (0, checkAuth_1.checkAuth)("USER", "ADMIN", "AGENT"), (0, validateRequest_1.validateRequest)(wallet_validation_1.walletValidation.updateBalance), wallet_controller_1.WalletController.updateWalletBalance);
 // Block wallet

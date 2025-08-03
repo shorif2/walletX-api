@@ -26,28 +26,19 @@ const addMoney = async (
     throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
   }
   if (wallet.isBlocked) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Wallet is blocked");
+    throw new AppError(httpStatus.BAD_REQUEST, "This wallet is blocked");
   }
 
   // Create transaction
   const transaction = await Transaction.create({
-    senderWallet,
-    walletNumber: wallet.walletNumber,
     type: TransactionType.ADD,
     initiatedBy: userId,
     amount,
-    status: TransactionStatus.PENDING,
+    status: TransactionStatus.COMPLETED,
   });
 
   // Update wallet balance
   await WalletServices.updateWalletBalance(userId, amount);
-
-  // Update transaction status to completed
-  await Transaction.findByIdAndUpdate(
-    transaction._id,
-    { status: TransactionStatus.COMPLETED },
-    { new: true }
-  );
 
   return transaction;
 };
@@ -144,7 +135,6 @@ const withdrawMoney = async (
 
   // Create transaction
   const transaction = await Transaction.create({
-    walletNumber: wallet.walletNumber,
     type: TransactionType.WITHDRAW,
     initiatedBy: userId,
     amount,

@@ -20,7 +20,12 @@ const createWallet = async (userId: Types.ObjectId): Promise<IWallet> => {
 const getWalletByUserId = async (
   userId: Types.ObjectId
 ): Promise<IWallet | null> => {
-  const wallet = await Wallet.findOne({ user: userId });
+  const wallet = await Wallet.findOne({ user: userId })
+    .populate({
+      path: "user",
+      select: ["name", "email", "role", "isBlocked"],
+    })
+    .select(["-createdAt"]);
   return wallet;
 };
 
@@ -71,7 +76,12 @@ const blockWallet = async (userId: Types.ObjectId): Promise<IWallet | null> => {
     { user: userId },
     { isBlocked: true },
     { new: true }
-  );
+  )
+    .populate({
+      path: "user",
+      select: ["name", "email", "role", "isBlocked"],
+    })
+    .select(["-updatedAt"]);
   return wallet;
 };
 
@@ -82,7 +92,12 @@ const unblockWallet = async (
     { user: userId },
     { isBlocked: false },
     { new: true }
-  );
+  )
+    .populate({
+      path: "user",
+      select: ["name", "email", "role", "isBlocked"],
+    })
+    .select(["-updatedAt"]);
   return wallet;
 };
 

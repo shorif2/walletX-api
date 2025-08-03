@@ -32,26 +32,44 @@ Wallet-X is a secure, modular, and role-based backend API for a digital wallet s
    cd wallet-x
    ```
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
-3. **Environment Variables:**
-   Create a `.env` file in the root directory with the following variables:
-   - PORT
-   - NODE_ENV
-   - MONGO_URI
-   - JWT_ACCESS_SECRET
-   - JWT_ACCESS_EXPIRES
-   - JWT_REFRESH_SECRET
-   - JWT_REFRESH_EXPIRES
-   - BCRYPT_SALT_ROUND
-   - SUPER_ADMIN_EMAIL
-   - SUPER_ADMIN_PASSWORD
-   - EXPRESS_SESSION_SECRET
-   - GOOGLE_CLIENT_ID
-   - GOOGLE_CLIENT_SECRET
-   - GOOGLE_CALLBACK_URL
-   - FRONTEND_URL
+
+3. ### Environment Variables
+
+```bash
+# Production environment variables
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/walletX
+
+# JWT
+JWT_ACCESS_SECRET=walletX
+JWT_ACCESS_EXPIRES=1d
+JWT_REFRESH_SECRET=walletXRefresh
+JWT_REFRESH_EXPIRES=1d
+
+# BCRYPT
+BCRYPT_SALT_ROUND=10
+
+# SUPER ADMIN
+SUPER_ADMIN_EMAIL=superAdmin@walletx.com
+SUPER_ADMIN_PASSWORD=walletX123
+
+# Google
+GOOGLE_CLIENT_SECRET=googleClientSecret
+GOOGLE_CLIENT_ID=googleClientId
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/v1/auth/google/callback
+
+# Express Session
+EXPRESS_SESSION_SECRET=express-session
+
+# Frontend URL
+FRONTEND_URL=http://localhost:5173
+```
+
 4. **Run the development server:**
    ```bash
    npm run dev
@@ -132,12 +150,12 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 **POST** `/auth/reset-password`
 
-**Request:**
+**Request:** (Requires JWT token in the header name `authorization`)
 
 ```json
 {
-  "oldPassword": "oldpass",
-  "newPassword": "newpass"
+  "newPassword": "Password123!!",
+  "oldPassword": "Password123!"
 }
 ```
 
@@ -177,9 +195,9 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "yourpassword"
+  "name": "Shorif Ahamed",
+  "email": "shorif@walletx.com",
+  "password": "Password123!"
 }
 ```
 
@@ -191,18 +209,14 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
   "success": true,
   "message": "User Created Successfully",
   "data": {
-    "_id": "688f13c370953c7cce0e9c52",
-    "name": "John Doe",
-    "email": "john@example.com",
+    "_id": "688fce730abe271d15a250af",
+    "name": "Shorif Ahamed",
+    "email": "shorif@walletx.com",
     "role": "USER",
-    "isApproved": "PENDING",
+    "isApproved": "ACTIVE",
     "isBlocked": false,
-    "createdAt": "2025-08-03T08:00:00.000Z",
-    "wallet": {
-      "walletNumber": "WAL1234567890",
-      "balance": 0,
-      "isBlocked": false
-    }
+    "createdAt": "2025-08-03T21:02:43.072Z",
+    "wallet": "688fce730abe271d15a250b2"
   }
 }
 ```
@@ -215,40 +229,29 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "statusCode": 200,
-  "success": true,
-  "message": "All Users Retrieved Successfully",
-  "data": [
-    {
-      "_id": "688f13c370953c7cce0e9c51",
-      "name": "User Jack",
-      "email": "user2@walletx.com",
-      "role": "USER",
-      "isApproved": "ACTIVE",
-      "isBlocked": false,
-      "createdAt": "2025-08-03T07:46:11.995Z",
-      "wallet": {
-        "walletNumber": "WAL7912698725",
-        "balance": 165,
-        "isBlocked": false
-      }
+    "statusCode": 201,
+    "success": true,
+    "message": "All Users Retrieved Successfully",
+    "meta": {
+        "total": 3
     },
-    {
-      "_id": "688f13c370953c7cce0e9c52",
-      "name": "John Doe",
-      "email": "john@example.com",
-      "role": "USER",
-      "isApproved": "PENDING",
-      "isBlocked": false,
-      "createdAt": "2025-08-03T08:00:00.000Z",
-      "wallet": {
-        "walletNumber": "WAL1234567890",
-        "balance": 0,
-        "isBlocked": false
-      }
-    }
-  ],
-  "meta": { "total": 2 }
+    "data": [
+        {
+            "_id": "688fcee90abe271d15a250b7",
+            "name": "Shorif Ahamed",
+            "email": "shorif@walletx.com",
+            "role": "USER",
+            "isApproved": "ACTIVE",
+            "isBlocked": false,
+            "createdAt": "2025-08-03T21:04:41.688Z",
+            "wallet": {
+                "walletNumber": "WAL4758189412",
+                "balance": 270,
+                "isBlocked": false
+            }
+        },
+        {...}
+    ]
 }
 ```
 
@@ -280,9 +283,41 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Get User by ID
+### Personal Profile
+
+**GET** `/user/me`
+
+**Request:** (Requires JWT token in the header name `authorization`)
+
+**Response (200):**
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User profile fetched successfully",
+  "data": {
+    "_id": "688fcee90abe271d15a250b7",
+    "name": "Shorif Ahamed",
+    "email": "shorif@walletx.com",
+    "role": "USER",
+    "isApproved": "ACTIVE",
+    "isBlocked": false,
+    "createdAt": "2025-08-03T21:04:41.688Z",
+    "wallet": {
+      "walletNumber": "WAL4758189412",
+      "balance": 270,
+      "isBlocked": false
+    }
+  }
+}
+```
+
+### User by ID
 
 **GET** `/user/:id`
+
+**Request:** (Requires JWT token in the header name `authorization`)
 
 **Response (200):**
 
@@ -292,23 +327,23 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
   "success": true,
   "message": "User Retrieved Successfully",
   "data": {
-    "_id": "688f13c370953c7cce0e9c51",
-    "name": "User Jack",
-    "email": "user2@walletx.com",
+    "_id": "688fcee90abe271d15a250b7",
+    "name": "Shorif Ahamed",
+    "email": "shorif@walletx.com",
     "role": "USER",
     "isApproved": "ACTIVE",
     "isBlocked": false,
-    "createdAt": "2025-08-03T07:46:11.995Z",
+    "createdAt": "2025-08-03T21:04:41.688Z",
     "wallet": {
-      "walletNumber": "WAL7912698725",
-      "balance": 165,
+      "walletNumber": "WAL4758189412",
+      "balance": 270,
       "isBlocked": false
     }
   }
 }
 ```
 
-#### Block User (Admin)
+### Block User (Admin)
 
 **PATCH** `/user/:id/block`
 
@@ -336,7 +371,63 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Unblock User (Admin)
+### Unblock User (Admin)
+
+**PATCH** `/user/:id/unblock`
+
+**Response (200):**
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User has been unblocked",
+  "data": {
+    "_id": "688f13c370953c7cce0e9c51",
+    "name": "User Jack",
+    "email": "user2@walletx.com",
+    "role": "USER",
+    "isApproved": "ACTIVE",
+    "isBlocked": false,
+    "createdAt": "2025-08-03T07:46:11.995Z",
+    "wallet": {
+      "walletNumber": "WAL7912698725",
+      "balance": 165,
+      "isBlocked": false
+    }
+  }
+}
+```
+
+### Block User (Admin)
+
+**PATCH** `/user/:id/block`
+
+**Response (200):**
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User has been blocked",
+  "data": {
+    "_id": "688f13c370953c7cce0e9c51",
+    "name": "User Jack",
+    "email": "user2@walletx.com",
+    "role": "USER",
+    "isApproved": "ACTIVE",
+    "isBlocked": true,
+    "createdAt": "2025-08-03T07:46:11.995Z",
+    "wallet": {
+      "walletNumber": "WAL7912698725",
+      "balance": 165,
+      "isBlocked": false
+    }
+  }
+}
+```
+
+### Unblock User (Admin)
 
 **PATCH** `/user/:id/unblock`
 
@@ -376,17 +467,25 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 {
   "statusCode": 200,
   "success": true,
-  "message": "Wallet retrieved successfully",
+  "message": "User Retrieved Successfully",
   "data": {
-    "walletNumber": "WAL7912698725",
-    "balance": 165,
+    "_id": "688fcee90abe271d15a250b7",
+    "name": "Shorif Ahamed",
+    "email": "shorif@walletx.com",
+    "role": "USER",
+    "isApproved": "ACTIVE",
     "isBlocked": false,
-    "userId": "688f13c370953c7cce0e9c51"
+    "createdAt": "2025-08-03T21:04:41.688Z",
+    "wallet": {
+      "walletNumber": "WAL4758189412",
+      "balance": 270,
+      "isBlocked": false
+    }
   }
 }
 ```
 
-### Get Wallet by Wallet Number
+### Get Wallet by Wallet Number (Admin)
 
 **GET** `/wallet/:walletNumber`
 
@@ -397,7 +496,76 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
   "success": true,
   "message": "Wallet retrieved successfully",
   "data": {
-    /* wallet object */
+    "_id": "688fceea0abe271d15a250ba",
+    "walletNumber": "WAL4758189412",
+    "balance": 50,
+    "accountType": "Savings",
+    "isBlocked": false,
+    "user": {
+      "_id": "688fcee90abe271d15a250b7",
+      "name": "Shorif Ahamed",
+      "email": "shorif@walletx.com",
+      "role": "USER",
+      "isApproved": "ACTIVE",
+      "isBlocked": false
+    },
+    "createdAt": "2025-08-03T21:04:42.332Z"
+  }
+}
+```
+
+### Block Wallet
+
+**PATCH** `/wallet/:userId/block`
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Wallet blocked successfully",
+  "data": {
+    "_id": "688fceea0abe271d15a250ba",
+    "walletNumber": "WAL4758189412",
+    "balance": 50,
+    "accountType": "Savings",
+    "isBlocked": true,
+    "user": {
+      "_id": "688fcee90abe271d15a250b7",
+      "name": "Shorif Ahamed",
+      "email": "shorif@walletx.com",
+      "role": "USER",
+      "isBlocked": false
+    },
+    "createdAt": "2025-08-03T21:04:42.332Z"
+  }
+}
+```
+
+### Unblock Wallet
+
+**PATCH** `/wallet/:userId/unblock`
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Wallet unblocked successfully",
+  "data": {
+    "_id": "688fceea0abe271d15a250ba",
+    "walletNumber": "WAL4758189412",
+    "balance": 50,
+    "accountType": "Savings",
+    "isBlocked": false,
+    "user": {
+      "_id": "688fcee90abe271d15a250b7",
+      "name": "Shorif Ahamed",
+      "email": "shorif@walletx.com",
+      "role": "USER",
+      "isBlocked": false
+    },
+    "createdAt": "2025-08-03T21:19:13.946Z"
   }
 }
 ```
@@ -425,26 +593,6 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
     "walletNumber": "WAL7912698725",
     "balance": 265,
     "isBlocked": false,
-    "userId": "688f13c370953c7cce0e9c51"
-  }
-}
-```
-
-### Block Wallet
-
-**PATCH** `/wallet/:userId/block`
-
-**Response (200):**
-
-```json
-{
-  "statusCode": 200,
-  "success": true,
-  "message": "Wallet blocked successfully",
-  "data": {
-    "walletNumber": "WAL7912698725",
-    "balance": 165,
-    "isBlocked": true,
     "userId": "688f13c370953c7cce0e9c51"
   }
 }
@@ -488,17 +636,16 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "statusCode": 201,
   "success": true,
   "message": "Money added successfully",
   "data": {
-    "_id": "789f13c370953c7cce0e9c99",
-    "type": "ADD_MONEY",
-    "amount": 100,
-    "fromWallet": null,
-    "toWallet": "WAL7912698725",
-    "createdAt": "2025-08-03T09:00:00.000Z",
-    "status": "SUCCESS"
+    "type": "add",
+    "initiatedBy": "688fcee90abe271d15a250b7",
+    "amount": 50,
+    "status": "completed",
+    "_id": "688fd70620f2d6c09c41c00c",
+    "createdAt": "2025-08-03T21:39:18.279Z",
+    "updatedAt": "2025-08-03T21:39:18.279Z"
   }
 }
 ```
@@ -511,8 +658,9 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "receiverWalletNumber": "1234567890",
-  "amount": 50
+  "recieverWallet": "WAL9833982578",
+  "amount": 15,
+  "note": "Birthday Gift"
 }
 ```
 
@@ -520,17 +668,19 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "statusCode": 201,
   "success": true,
   "message": "Money sent successfully",
   "data": {
-    "_id": "789f13c370953c7cce0e9c98",
-    "type": "SEND_MONEY",
-    "amount": 50,
-    "fromWallet": "WAL7912698725",
-    "toWallet": "1234567890",
-    "createdAt": "2025-08-03T09:05:00.000Z",
-    "status": "SUCCESS"
+    "senderWallet": "WAL4758189412",
+    "type": "send",
+    "initiatedBy": "688fcee90abe271d15a250b7",
+    "recieverWallet": "WAL9833982578",
+    "note": "Birthday Gift",
+    "amount": 15,
+    "status": "completed",
+    "_id": "688fd9ad5f106679f1df46b9",
+    "createdAt": "2025-08-03T21:50:37.922Z",
+    "updatedAt": "2025-08-03T21:50:37.922Z"
   }
 }
 ```
@@ -543,7 +693,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "amount": 30
+  "amount": 25,
+  "note": "For buying a Macbook"
 }
 ```
 
@@ -551,17 +702,17 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "statusCode": 201,
   "success": true,
   "message": "Money withdrawn successfully",
   "data": {
-    "_id": "789f13c370953c7cce0e9c97",
-    "type": "WITHDRAW",
-    "amount": 30,
-    "fromWallet": "WAL7912698725",
-    "toWallet": null,
-    "createdAt": "2025-08-03T09:10:00.000Z",
-    "status": "SUCCESS"
+    "type": "withdraw",
+    "initiatedBy": "688fcee90abe271d15a250b7",
+    "note": "For buying a Macbook",
+    "amount": 25,
+    "status": "completed",
+    "_id": "688fd7aeab1afb68b2e76bde",
+    "createdAt": "2025-08-03T21:42:06.580Z",
+    "updatedAt": "2025-08-03T21:42:06.580Z"
   }
 }
 ```
@@ -718,6 +869,118 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
       "status": "SUCCESS"
     }
   ]
+}
+```
+
+### My Transaction History
+
+**GET** `/transaction/my-history`
+
+**Request:** (Requires JWT token in the header name `authorization`)
+
+**Response (201):**
+
+```json
+{
+    "success": true,
+    "message": "Transaction history retrieved successfully",
+    "data": [
+        {
+            "_id": "688fda24dadf2fbff4a1ebcb",
+            "senderWallet": "WAL4758189412",
+            "type": "send",
+            "initiatedBy": {
+                "_id": "688fcee90abe271d15a250b7",
+                "name": "Shorif Ahamed",
+                "email": "shorif@walletx.com"
+            },
+            "recieverWallet": "WAL9833982578",
+            "note": "Birthday Gift",
+            "amount": 15,
+            "status": "completed",
+            "createdAt": "2025-08-03T21:52:36.812Z",
+            "updatedAt": "2025-08-03T21:52:36.812Z"
+        },{...}]}
+```
+
+### Transactions by ID (Admin)
+
+**GET** `/transaction/:transactionId`
+
+**Request:** (Requires JWT token in the header name `authorization`)
+
+**Response (201):**
+
+```json
+{
+  "success": true,
+  "message": "Transaction retrieved successfully",
+  "data": {
+    "_id": "688fd3cfcdbac48f61f191b2",
+    "senderWallet": "WAL4758189412",
+    "walletNumber": "WAL4758189412",
+    "type": "add",
+    "initiatedBy": {
+      "_id": "688fcee90abe271d15a250b7",
+      "name": "Shorif Ahamed",
+      "email": "shorif@walletx.com"
+    },
+    "amount": 100,
+    "status": "completed",
+    "createdAt": "2025-08-03T21:25:35.007Z",
+    "updatedAt": "2025-08-03T21:25:35.646Z"
+  }
+}
+```
+
+### Get All Transactions with query
+
+**GET** `/transaction`
+
+Supports filtering, and sorting.
+
+#### Example Query:
+
+`page=1&limit=10&type=add&status=completed`
+
+#### Query Parameters:
+
+- `page`: Page number (default: 1)
+- `limit`: Number of results (default: 10)
+- `type`: Filter by type (add, send, cash-in, cash-out)
+- `status`: Filter by status (completed, pending)
+
+#### Response:
+
+```json
+{
+    "success": true,
+    "message": "All transactions retrieved successfully",
+    "data": [
+        {
+            "_id": "688fda24dadf2fbff4a1ebcb",
+            "senderWallet": "WAL4758189412",
+            "type": "send",
+            "initiatedBy": {
+                "_id": "688fcee90abe271d15a250b7",
+                "name": "Shorif Ahamed",
+                "email": "shorif@walletx.com"
+            },
+            "recieverWallet": "WAL9833982578",
+            "note": "Birthday Gift",
+            "amount": 15,
+            "status": "completed",
+            "createdAt": "2025-08-03T21:52:36.812Z",
+            "updatedAt": "2025-08-03T21:52:36.812Z"
+        },
+        {...}
+    ],
+    "meta": {
+        "total": 8,
+        "page": 1,
+        "totalPages": 1,
+        "limit": 10
+    }
 }
 ```
 
