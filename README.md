@@ -48,7 +48,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Auth
 
-#### User Login
+### User Login
 
 **POST** `/auth/login`
 
@@ -89,25 +89,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Refresh Access Token
-
-**POST** `/auth/refresh-token`
-
-**Request:** (Cookie: refreshToken)
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "New Access Token Retrived Successfully",
-  "data": {
-    "accessToken": "<jwt-token>",
-    "refreshToken": "<jwt-token>"
-  }
-}
-```
+````
 
 #### User Logout
 
@@ -124,9 +106,9 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
   "message": "User Logged Out Successfully",
   "data": null
 }
-```
+````
 
-#### Reset Password
+### Reset Password
 
 **POST** `/auth/reset-password`
 
@@ -150,9 +132,24 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
+### LogOut
+
+**POST** `/auth/logout`
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "User Logged Out Successfully",
+  "data": null
+}
+```
+
 ### User
 
-#### Register New User
+### Register New User
 
 **POST** `/user/register`
 
@@ -190,7 +187,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Get All Users (Admin)
+### Get All Users (Admin)
 
 **GET** `/user/all-users`
 
@@ -349,7 +346,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Wallet
 
-#### Get Wallet by User ID
+### Get Wallet by User ID
 
 **GET** `/wallet/user/:userId`
 
@@ -369,7 +366,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Get Wallet by Wallet Number
+### Get Wallet by Wallet Number
 
 **GET** `/wallet/:walletNumber`
 
@@ -385,7 +382,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Update Wallet Balance
+### Update Wallet Balance
 
 **PATCH** `/wallet/:userId/balance`
 
@@ -413,7 +410,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Block Wallet
+### Block Wallet
 
 **PATCH** `/wallet/:userId/block`
 
@@ -433,7 +430,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Unblock Wallet
+### Unblock Wallet
 
 **PATCH** `/wallet/:userId/unblock`
 
@@ -455,7 +452,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Transaction
 
-#### Add Money to Wallet
+### Add Money to Wallet
 
 **POST** `/transaction/add`
 
@@ -486,7 +483,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Send Money to Another User
+### Send Money to Another User
 
 **POST** `/transaction/send`
 
@@ -518,7 +515,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Withdraw Money from Wallet
+### Withdraw Money from Wallet
 
 **POST** `/transaction/withdraw`
 
@@ -706,7 +703,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Agent
 
-#### Create Agent (Admin)
+### Create Agent (Admin)
 
 **POST** `/agent/create`
 
@@ -739,7 +736,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Get All Agents (Admin)
+### Get All Agents (Admin)
 
 **GET** `/agent/all`
 
@@ -773,7 +770,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Get Agent by ID (Admin)
+### Get Agent by ID (Admin)
 
 **GET** `/agent/:id`
 
@@ -796,7 +793,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Update Agent (Admin)
+### Update Agent (Admin)
 
 **PATCH** `/agent/:id`
 
@@ -827,7 +824,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Update Agent Status (Admin)
+### Update Agent Status (Admin)
 
 **PATCH** `/agent/:id/status`
 
@@ -858,7 +855,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### Delete Agent (Admin)
+### Delete Agent (Admin)
 
 **DELETE** `/agent/:id`
 
