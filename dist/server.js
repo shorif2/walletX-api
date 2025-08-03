@@ -19,7 +19,7 @@ const env_1 = require("./app/config/env");
 let server;
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect(env_1.envVars.MONGO_URI);
+        mongoose_1.default.connect(env_1.envVars.MONGO_URI);
         console.log("Connected to MongoDB");
         server = app_1.default.listen(env_1.envVars.PORT, () => {
             console.log(`Server is running on port ${env_1.envVars.PORT}`);
