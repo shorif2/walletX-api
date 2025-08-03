@@ -35,7 +35,6 @@ const resetPassword = (oldPassword, newPassword, decodedToken) => __awaiter(void
     user.password = yield bcryptjs_1.default.hash(newPassword, Number(env_1.envVars.BCRYPT_SALT_ROUND));
     user.save();
 });
-//user - login - token (email, role, _id) - booking / payment / booking / payment cancel - token
 exports.AuthServices = {
     // credentialsLogin,
     getNewAccessToken,

@@ -66,6 +66,10 @@ const userSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
+    wallet: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Wallet",
+    },
 }, {
     timestamps: true,
     versionKey: false,

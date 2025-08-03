@@ -16,15 +16,15 @@ const createWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () 
     // Generate a unique wallet number
     const walletNumber = yield (0, walletNumberGenerator_1.generateWalletNumber)();
     const wallet = yield wallet_model_1.Wallet.create({
-        userId,
+        user: userId,
         walletNumber,
-        balance: 50, // Default balance as per model
-        isBlocked: false, // Default to not blocked
+        balance: 50,
+        isBlocked: false,
     });
     return wallet;
 });
 const getWalletByUserId = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOne({ userId });
+    const wallet = yield wallet_model_1.Wallet.findOne({ user: userId });
     return wallet;
 });
 const getWalletById = (walletId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -32,19 +32,34 @@ const getWalletById = (walletId) => __awaiter(void 0, void 0, void 0, function* 
     return wallet;
 });
 const getWalletByWalletNumber = (walletNumber) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOne({ walletNumber });
+    const wallet = yield wallet_model_1.Wallet.findOne({ walletNumber })
+        .select(["-updatedAt", "-password"])
+        .populate({
+        path: "user",
+        select: ["-wallet", "-updatedAt", "-createdAt", "-password"],
+    });
     return wallet;
 });
-const updateWalletBalance = (userId, amount) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ userId }, { $inc: { balance: amount } }, { new: true });
+const updateWalletBalance = (identifier, amount) => __awaiter(void 0, void 0, void 0, function* () {
+    let query;
+    // Check if identifier is a wallet number (string) or userId (ObjectId)
+    if (typeof identifier === "string" && identifier.length >= 10) {
+        // It's a wallet number
+        query = { walletNumber: identifier };
+    }
+    else {
+        // It's a userId
+        query = { user: identifier };
+    }
+    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate(query, { $inc: { balance: amount } }, { new: true });
     return wallet;
 });
 const blockWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ userId }, { isBlocked: true }, { new: true });
+    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ user: userId }, { isBlocked: true }, { new: true });
     return wallet;
 });
 const unblockWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ userId }, { isBlocked: false }, { new: true });
+    const wallet = yield wallet_model_1.Wallet.findOneAndUpdate({ user: userId }, { isBlocked: false }, { new: true });
     return wallet;
 });
 exports.WalletServices = {

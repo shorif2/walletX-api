@@ -2,14 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wallet = void 0;
 const mongoose_1 = require("mongoose");
-// todo: daily limit monthly limit
 const walletSchema = new mongoose_1.Schema({
-    userId: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-        unique: true,
-    },
     walletNumber: {
         type: String,
         required: true,
@@ -22,9 +15,19 @@ const walletSchema = new mongoose_1.Schema({
         default: 50,
         min: 0,
     },
+    accountType: {
+        type: String,
+        default: "Savings",
+    },
     isBlocked: {
         type: Boolean,
         default: false,
+    },
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        unique: true,
     },
 }, {
     timestamps: true,

@@ -36,18 +36,9 @@ const auth_service_1 = require("./auth.service");
 const credentialsLogin = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     passport_1.default.authenticate("local", (err, user, info) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
-            // ❌❌❌❌❌
-            // throw new AppError(401, "Some error")
-            // next(err)
-            // return new AppError(401, err)
-            // ✅✅✅✅
-            // return next(err)
-            // console.log("from err");
             return next(new AppError_1.default(401, err));
         }
         if (!user) {
-            // console.log("from !user");
-            // return new AppError(401, info.message)
             return next(new AppError_1.default(401, info.message));
         }
         const userTokens = yield (0, userTokens_1.createUserTokens)(user);

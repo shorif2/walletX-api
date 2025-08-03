@@ -8,10 +8,10 @@ const createWallet = async (userId: Types.ObjectId): Promise<IWallet> => {
   const walletNumber = await generateWalletNumber();
 
   const wallet = await Wallet.create({
-    userId,
+    user: userId,
     walletNumber,
-    balance: 50, // Default balance as per model
-    isBlocked: false, // Default to not blocked
+    balance: 50,
+    isBlocked: false,
   });
 
   return wallet;
@@ -20,7 +20,7 @@ const createWallet = async (userId: Types.ObjectId): Promise<IWallet> => {
 const getWalletByUserId = async (
   userId: Types.ObjectId
 ): Promise<IWallet | null> => {
-  const wallet = await Wallet.findOne({ userId });
+  const wallet = await Wallet.findOne({ user: userId });
   return wallet;
 };
 
@@ -34,16 +34,32 @@ const getWalletById = async (
 const getWalletByWalletNumber = async (
   walletNumber: string
 ): Promise<IWallet | null> => {
-  const wallet = await Wallet.findOne({ walletNumber });
+  const wallet = await Wallet.findOne({ walletNumber })
+    .select(["-updatedAt", "-password"])
+    .populate({
+      path: "user",
+      select: ["-wallet", "-updatedAt", "-createdAt", "-password"],
+    });
   return wallet;
 };
 
 const updateWalletBalance = async (
-  userId: Types.ObjectId,
+  identifier: string | Types.ObjectId,
   amount: number
 ): Promise<IWallet | null> => {
+  let query: { walletNumber?: string; user?: Types.ObjectId };
+
+  // Check if identifier is a wallet number (string) or userId (ObjectId)
+  if (typeof identifier === "string" && identifier.length >= 10) {
+    // It's a wallet number
+    query = { walletNumber: identifier };
+  } else {
+    // It's a userId
+    query = { user: identifier as Types.ObjectId };
+  }
+
   const wallet = await Wallet.findOneAndUpdate(
-    { userId },
+    query,
     { $inc: { balance: amount } },
     { new: true }
   );
@@ -52,7 +68,7 @@ const updateWalletBalance = async (
 
 const blockWallet = async (userId: Types.ObjectId): Promise<IWallet | null> => {
   const wallet = await Wallet.findOneAndUpdate(
-    { userId },
+    { user: userId },
     { isBlocked: true },
     { new: true }
   );
@@ -63,7 +79,7 @@ const unblockWallet = async (
   userId: Types.ObjectId
 ): Promise<IWallet | null> => {
   const wallet = await Wallet.findOneAndUpdate(
-    { userId },
+    { user: userId },
     { isBlocked: false },
     { new: true }
   );

@@ -5,7 +5,6 @@ import {
   TransactionStatus,
 } from "./transaction.types";
 import { WalletServices } from "../wallet/wallet.service";
-import { UserServices } from "../user/user.service";
 import { Types } from "mongoose";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
@@ -33,6 +32,7 @@ const addMoney = async (
   // Create transaction
   const transaction = await Transaction.create({
     senderWallet,
+    walletNumber: wallet.walletNumber,
     type: TransactionType.ADD,
     initiatedBy: userId,
     amount,
@@ -94,7 +94,7 @@ const sendMoney = async (
   }
 
   // Ensure wallet IDs exist
-  if (!toWallet._id || !toWallet.userId) {
+  if (!toWallet._id || !toWallet.user) {
     throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Invalid wallet data");
   }
 
@@ -111,7 +111,7 @@ const sendMoney = async (
 
   // Update both wallet balances
   await WalletServices.updateWalletBalance(fromUserId, -amount);
-  await WalletServices.updateWalletBalance(toWallet.userId, amount);
+  await WalletServices.updateWalletBalance(toWallet.user._id, amount);
 
   return transaction;
 };
@@ -160,7 +160,8 @@ const withdrawMoney = async (
 
 // Agent cash-in: Add money to any user's wallet
 const agentCashIn = async (
-  agentId: Types.ObjectId,
+  role: string,
+  _id: Types.ObjectId,
   walletNumber: string,
   amount: number,
   note?: string
@@ -171,11 +172,10 @@ const agentCashIn = async (
   }
 
   // Verify agent exists and has AGENT role
-  const agent = await UserServices.getUserById(agentId);
-  if (!agent) {
+  if (!role) {
     throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
   }
-  if (agent.role !== "AGENT") {
+  if (role !== "AGENT") {
     throw new AppError(
       httpStatus.FORBIDDEN,
       "Only agents can perform this operation"
@@ -198,21 +198,22 @@ const agentCashIn = async (
   const transaction = await Transaction.create({
     walletNumber: wallet.walletNumber,
     type: TransactionType.CASH_IN,
-    initiatedBy: agentId,
+    initiatedBy: _id,
     amount,
     status: TransactionStatus.COMPLETED,
     note: note ? `Agent cash-in: ${note}` : "Agent cash-in",
   });
 
   // Update wallet balance
-  await WalletServices.updateWalletBalance(wallet.userId as any, amount);
+  await WalletServices.updateWalletBalance(walletNumber, amount);
 
   return transaction;
 };
 
 // Agent cash-out: Withdraw money from any user's wallet
 const agentCashOut = async (
-  agentId: Types.ObjectId,
+  role: string,
+  _id: Types.ObjectId,
   walletNumber: string,
   amount: number,
   note?: string
@@ -222,12 +223,10 @@ const agentCashOut = async (
     throw new AppError(httpStatus.BAD_REQUEST, "Minimum amount is 10");
   }
 
-  // Verify agent exists and has AGENT role
-  const agent = await UserServices.getUserById(agentId);
-  if (!agent) {
+  if (!role) {
     throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
   }
-  if (agent.role !== "AGENT") {
+  if (role !== "AGENT") {
     throw new AppError(
       httpStatus.FORBIDDEN,
       "Only agents can perform this operation"
@@ -258,21 +257,21 @@ const agentCashOut = async (
   const transaction = await Transaction.create({
     walletNumber: wallet.walletNumber,
     type: TransactionType.CASH_OUT,
-    initiatedBy: agentId,
+    initiatedBy: _id,
     amount,
     status: TransactionStatus.COMPLETED,
     note: note ? `Agent cash-out: ${note}` : "Agent cash-out",
   });
 
   // Update wallet balance
-  await WalletServices.updateWalletBalance(wallet.userId as any, -amount);
+  await WalletServices.updateWalletBalance(walletNumber, -amount);
 
   return transaction;
 };
 
 // Get transaction history for a wallet
 const getTransactionHistory = async (
-  walletId: Types.ObjectId,
+  walletNumber: any,
   page = 1,
   limit = 10
 ): Promise<{
@@ -283,14 +282,17 @@ const getTransactionHistory = async (
 }> => {
   const skip = (page - 1) * limit;
 
-  const transactions = await Transaction.find({ walletId })
+  const transactions = await Transaction.find({
+    $or: [{ senderWallet: walletNumber }, { recieverWallet: walletNumber }],
+  })
     .populate("initiatedBy", "name email")
-    .populate("toWalletId", "userId")
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
 
-  const total = await Transaction.countDocuments({ walletId });
+  const total = await Transaction.countDocuments({
+    $or: [{ senderWallet: walletNumber }, { recieverWallet: walletNumber }],
+  });
   const totalPages = Math.ceil(total / limit);
 
   return {
@@ -305,9 +307,10 @@ const getTransactionHistory = async (
 const getTransactionById = async (
   transactionId: Types.ObjectId
 ): Promise<ITransaction | null> => {
-  const transaction = await Transaction.findById(transactionId)
-    .populate("initiatedBy", "name email")
-    .populate("toWalletId", "userId");
+  const transaction = await Transaction.findById(transactionId).populate(
+    "initiatedBy",
+    "name email"
+  );
 
   return transaction;
 };
@@ -332,7 +335,6 @@ const getAllTransactions = async (
 
   const transactions = await Transaction.find(filter)
     .populate("initiatedBy", "name email")
-    .populate("toWalletId", "userId")
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);

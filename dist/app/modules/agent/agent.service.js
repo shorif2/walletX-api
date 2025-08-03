@@ -19,10 +19,12 @@ const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const env_1 = require("../../config/env");
+const user_model_1 = require("../user/user.model");
 const createAgent = (agentData, createdBy) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if agent with same email already exists
-    const existingAgentByEmail = yield agent_model_1.Agent.findOne({ email: agentData.email });
-    if (existingAgentByEmail) {
+    const isAgentExist = yield agent_model_1.Agent.findOne({ email: agentData.email });
+    const isUserExist = yield user_model_1.User.findOne({ email: agentData.email });
+    if (isAgentExist || isUserExist) {
         throw new AppError_1.default(http_status_codes_1.default.CONFLICT, "Agent with this email already exists");
     }
     // Hash the password

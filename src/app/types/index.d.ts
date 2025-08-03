@@ -1,15 +1,13 @@
-import { IUser, Role } from "../modules/user/user.types";
+import { IUser } from "../modules/user/user.types";
 
 declare global {
   namespace Express {
-    interface User {
-      _id?: Types.ObjectId;
-      role?: Role;
+    interface User extends IUser {
       note?: string;
     }
 
     interface Request {
-      user?: User | IUser;
+      user?: User;
     }
   }
 }

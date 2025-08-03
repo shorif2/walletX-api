@@ -32,7 +32,7 @@ const addMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, vo
     if (!wallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }
-    const transaction = yield transaction_service_1.TransactionServices.addMoney(wallet._id, userId, amount);
+    const transaction = yield transaction_service_1.TransactionServices.addMoney(wallet.walletNumber, userId, amount);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Money added successfully",
@@ -90,10 +90,11 @@ const getMyTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __awa
     }
     // Get user's wallet
     const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(userId);
+    console.log(wallet);
     if (!wallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }
-    const result = yield transaction_service_1.TransactionServices.getTransactionHistory(wallet._id, page, limit);
+    const result = yield transaction_service_1.TransactionServices.getTransactionHistory(wallet.walletNumber, page, limit);
     res.status(http_status_codes_1.default.OK).json({
         success: true,
         message: "Transaction history retrieved successfully",
@@ -151,13 +152,12 @@ const getAllTransactions = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(
 }));
 // Agent cash-in: Add money to any user's wallet
 const agentCashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const { walletNumber, amount, note } = req.body;
-    const agentId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
-    if (!agentId) {
+    const { role, _id } = req.user || {};
+    if (!role || !_id) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Agent not authenticated");
     }
-    const transaction = yield transaction_service_1.TransactionServices.agentCashIn(agentId, walletNumber, amount, note);
+    const transaction = yield transaction_service_1.TransactionServices.agentCashIn(role, _id, walletNumber, amount, note);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Agent cash-in completed successfully",
@@ -166,13 +166,12 @@ const agentCashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
 }));
 // Agent cash-out: Withdraw money from any user's wallet
 const agentCashOut = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const { walletNumber, amount, note } = req.body;
-    const agentId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
-    if (!agentId) {
+    const { role, _id } = req.user || {};
+    if (!role || !_id) {
         throw new AppError_1.default(http_status_codes_1.default.UNAUTHORIZED, "Agent not authenticated");
     }
-    const transaction = yield transaction_service_1.TransactionServices.agentCashOut(agentId, walletNumber, amount, note);
+    const transaction = yield transaction_service_1.TransactionServices.agentCashOut(role, _id, walletNumber, amount, note);
     res.status(http_status_codes_1.default.CREATED).json({
         success: true,
         message: "Agent cash-out completed successfully",

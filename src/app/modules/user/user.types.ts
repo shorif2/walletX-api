@@ -20,4 +20,5 @@ export interface IUser {
   role?: Role;
   isApproved?: isApproved;
   isBlocked?: boolean;
+  wallet?: Types.ObjectId;
 }

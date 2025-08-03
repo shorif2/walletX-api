@@ -16,20 +16,10 @@ const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate("local", async (err: any, user: any, info: any) => {
       if (err) {
-        // ❌❌❌❌❌
-        // throw new AppError(401, "Some error")
-        // next(err)
-        // return new AppError(401, err)
-
-        // ✅✅✅✅
-        // return next(err)
-        // console.log("from err");
         return next(new AppError(401, err));
       }
 
       if (!user) {
-        // console.log("from !user");
-        // return new AppError(401, info.message)
         return next(new AppError(401, info.message));
       }
 

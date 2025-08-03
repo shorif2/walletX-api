@@ -10,14 +10,16 @@ import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import { envVars } from "../../config/env";
+import { User } from "../user/user.model";
 
 const createAgent = async (
   agentData: IAgentCreateRequest,
   createdBy: Types.ObjectId
 ): Promise<IAgent> => {
   // Check if agent with same email already exists
-  const existingAgentByEmail = await Agent.findOne({ email: agentData.email });
-  if (existingAgentByEmail) {
+  const isAgentExist = await Agent.findOne({ email: agentData.email });
+  const isUserExist = await User.findOne({ email: agentData.email });
+  if (isAgentExist || isUserExist) {
     throw new AppError(
       httpStatus.CONFLICT,
       "Agent with this email already exists"

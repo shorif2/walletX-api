@@ -23,7 +23,7 @@ router.get(
 // Update wallet balance
 router.patch(
   "/:userId/balance",
-  checkAuth("USER", "ADMIN", "SUPER_ADMIN", "AGENT"),
+  checkAuth("USER", "ADMIN", "AGENT"),
   validateRequest(walletValidation.updateBalance),
   WalletController.updateWalletBalance
 );
@@ -31,7 +31,7 @@ router.patch(
 // Block wallet
 router.patch(
   "/:userId/block",
-  checkAuth("ADMIN"),
+  checkAuth("ADMIN", "USER"),
   WalletController.blockWallet
 );
 

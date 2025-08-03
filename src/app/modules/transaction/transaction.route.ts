@@ -17,7 +17,7 @@ router.post(
 // Send money to another user
 router.post(
   "/send",
-  checkAuth("USER"),
+  checkAuth("USER", "ADMIN"),
   validateRequest(transactionValidation.sendMoney),
   TransactionController.sendMoney
 );
@@ -49,7 +49,7 @@ router.post(
 // Get my transaction history
 router.get(
   "/my-history",
-  checkAuth("USER"),
+  checkAuth("USER", "ADMIN"),
   TransactionController.getMyTransactionHistory
 );
 
@@ -61,10 +61,6 @@ router.get(
 );
 
 // Get all transactions (admin only)
-router.get(
-  "/",
-  checkAuth("ADMIN", "SUPER_ADMIN"),
-  TransactionController.getAllTransactions
-);
+router.get("/", checkAuth("ADMIN"), TransactionController.getAllTransactions);
 
 export const TransactionRoutes = router;

@@ -20,30 +20,28 @@ const passport_local_1 = require("passport-local");
 const user_types_1 = require("../modules/user/user.types");
 const user_model_1 = require("../modules/user/user.model");
 const env_1 = require("./env");
+const agent_model_1 = require("../modules/agent/agent.model");
 passport_1.default.use(new passport_local_1.Strategy({
     usernameField: "email",
     passwordField: "password",
 }, (email, password, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const isUserExist = yield user_model_1.User.findOne({ email });
-        // if (!isUserExist) {
-        //     return done(null, false, { message: "User does not exist" })
-        // }
+        const user = yield user_model_1.User.findOne({ email })
+            .populate({
+            path: "wallet",
+            select: ["walletNumber", "balance", "isBlocked", "-_id"],
+        })
+            .select(["-updatedAt"]);
+        const agent = yield agent_model_1.Agent.findOne({ email }).select(["-updatedAt"]);
+        const isUserExist = (user || agent);
         if (!isUserExist) {
             return done("User does not exist");
         }
-        // const isGoogleAuthenticated = isUserExist?.auths.some(
-        //   (providerObjects) => providerObjects.provider == "google"
-        // );
-        // if (isGoogleAuthenticated && !isUserExist.password) {
         if (!isUserExist.password) {
             return done(null, false, {
                 message: "You have authenticated through Google. So if you want to login with credentials, then at first login with google and set a password for your Gmail and then you can login with email and password.",
             });
         }
-        // if (isGoogleAuthenticated) {
-        //     return done("You have authenticated through Google. So if you want to login with credentials, then at first login with google and set a password for your Gmail and then you can login with email and password.")
-        // }
         const isPasswordMatched = yield bcryptjs_1.default.compare(password, isUserExist.password);
         if (!isPasswordMatched) {
             return done(null, false, { message: "Password does not match" });
@@ -89,10 +87,6 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
         return done(error);
     }
 })));
-// frontend localhost:5173/login?redirect=/booking -> localhost:5000/api/v1/auth/google?redirect=/booking -> passport -> Google OAuth Consent -> gmail login -> successful -> callback url localhost:5000/api/v1/auth/google/callback -> db store -> token
-// Bridge == Google -> user db store -> token
-//Custom -> email , password, role : USER, name... -> registration -> DB -> 1 User create
-//Google -> req -> google -> successful : Jwt Token : Role , email -> DB - Store -> token - api access
 passport_1.default.serializeUser((user, done) => {
     done(null, user._id);
 });

@@ -1,16 +1,8 @@
 import { Schema, model } from "mongoose";
 import { IWallet } from "./wallet.types";
 
-// todo: daily limit monthly limit
-
 const walletSchema = new Schema<IWallet>(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      unique: true,
-    },
     walletNumber: {
       type: String,
       required: true,
@@ -23,9 +15,19 @@ const walletSchema = new Schema<IWallet>(
       default: 50,
       min: 0,
     },
+    accountType: {
+      type: String,
+      default: "Savings",
+    },
     isBlocked: {
       type: Boolean,
       default: false,
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
     },
   },
   {

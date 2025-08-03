@@ -16,7 +16,6 @@ exports.TransactionServices = void 0;
 const transaction_model_1 = require("./transaction.model");
 const transaction_types_1 = require("./transaction.types");
 const wallet_service_1 = require("../wallet/wallet.service");
-const user_service_1 = require("../user/user.service");
 const AppError_1 = __importDefault(require("../../errorHelpers/AppError"));
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 // Add money to wallet
@@ -36,6 +35,7 @@ const addMoney = (senderWallet, userId, amount) => __awaiter(void 0, void 0, voi
     // Create transaction
     const transaction = yield transaction_model_1.Transaction.create({
         senderWallet,
+        walletNumber: wallet.walletNumber,
         type: transaction_types_1.TransactionType.ADD,
         initiatedBy: userId,
         amount,
@@ -79,7 +79,7 @@ const sendMoney = (fromWalletId, fromUserId, recieverWallet, amount, note) => __
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Cannot send money to yourself");
     }
     // Ensure wallet IDs exist
-    if (!toWallet._id || !toWallet.userId) {
+    if (!toWallet._id || !toWallet.user) {
         throw new AppError_1.default(http_status_codes_1.default.INTERNAL_SERVER_ERROR, "Invalid wallet data");
     }
     // Create transaction
@@ -94,7 +94,7 @@ const sendMoney = (fromWalletId, fromUserId, recieverWallet, amount, note) => __
     });
     // Update both wallet balances
     yield wallet_service_1.WalletServices.updateWalletBalance(fromUserId, -amount);
-    yield wallet_service_1.WalletServices.updateWalletBalance(toWallet.userId, amount);
+    yield wallet_service_1.WalletServices.updateWalletBalance(toWallet.user._id, amount);
     return transaction;
 });
 // Withdraw money from wallet
@@ -131,17 +131,16 @@ userId, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
     return transaction;
 });
 // Agent cash-in: Add money to any user's wallet
-const agentCashIn = (agentId, walletNumber, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
+const agentCashIn = (role, _id, walletNumber, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
     // Validate amount
     if (amount < 10) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Minimum amount is 10");
     }
     // Verify agent exists and has AGENT role
-    const agent = yield user_service_1.UserServices.getUserById(agentId);
-    if (!agent) {
+    if (!role) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Agent not found");
     }
-    if (agent.role !== "AGENT") {
+    if (role !== "AGENT") {
         throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "Only agents can perform this operation");
     }
     // Check if target user's wallet exists and is not blocked
@@ -156,27 +155,25 @@ const agentCashIn = (agentId, walletNumber, amount, note) => __awaiter(void 0, v
     const transaction = yield transaction_model_1.Transaction.create({
         walletNumber: wallet.walletNumber,
         type: transaction_types_1.TransactionType.CASH_IN,
-        initiatedBy: agentId,
+        initiatedBy: _id,
         amount,
         status: transaction_types_1.TransactionStatus.COMPLETED,
         note: note ? `Agent cash-in: ${note}` : "Agent cash-in",
     });
     // Update wallet balance
-    yield wallet_service_1.WalletServices.updateWalletBalance(wallet.userId, amount);
+    yield wallet_service_1.WalletServices.updateWalletBalance(walletNumber, amount);
     return transaction;
 });
 // Agent cash-out: Withdraw money from any user's wallet
-const agentCashOut = (agentId, walletNumber, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
+const agentCashOut = (role, _id, walletNumber, amount, note) => __awaiter(void 0, void 0, void 0, function* () {
     // Validate amount
     if (amount < 10) {
         throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Minimum amount is 10");
     }
-    // Verify agent exists and has AGENT role
-    const agent = yield user_service_1.UserServices.getUserById(agentId);
-    if (!agent) {
+    if (!role) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Agent not found");
     }
-    if (agent.role !== "AGENT") {
+    if (role !== "AGENT") {
         throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "Only agents can perform this operation");
     }
     // Check if target user's wallet exists and is not blocked
@@ -195,25 +192,28 @@ const agentCashOut = (agentId, walletNumber, amount, note) => __awaiter(void 0, 
     const transaction = yield transaction_model_1.Transaction.create({
         walletNumber: wallet.walletNumber,
         type: transaction_types_1.TransactionType.CASH_OUT,
-        initiatedBy: agentId,
+        initiatedBy: _id,
         amount,
         status: transaction_types_1.TransactionStatus.COMPLETED,
         note: note ? `Agent cash-out: ${note}` : "Agent cash-out",
     });
     // Update wallet balance
-    yield wallet_service_1.WalletServices.updateWalletBalance(wallet.userId, -amount);
+    yield wallet_service_1.WalletServices.updateWalletBalance(walletNumber, -amount);
     return transaction;
 });
 // Get transaction history for a wallet
-const getTransactionHistory = (walletId_1, ...args_1) => __awaiter(void 0, [walletId_1, ...args_1], void 0, function* (walletId, page = 1, limit = 10) {
+const getTransactionHistory = (walletNumber_1, ...args_1) => __awaiter(void 0, [walletNumber_1, ...args_1], void 0, function* (walletNumber, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
-    const transactions = yield transaction_model_1.Transaction.find({ walletId })
+    const transactions = yield transaction_model_1.Transaction.find({
+        $or: [{ senderWallet: walletNumber }, { recieverWallet: walletNumber }],
+    })
         .populate("initiatedBy", "name email")
-        .populate("toWalletId", "userId")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
-    const total = yield transaction_model_1.Transaction.countDocuments({ walletId });
+    const total = yield transaction_model_1.Transaction.countDocuments({
+        $or: [{ senderWallet: walletNumber }, { recieverWallet: walletNumber }],
+    });
     const totalPages = Math.ceil(total / limit);
     return {
         transactions,
@@ -224,9 +224,7 @@ const getTransactionHistory = (walletId_1, ...args_1) => __awaiter(void 0, [wall
 });
 // Get transaction by ID
 const getTransactionById = (transactionId) => __awaiter(void 0, void 0, void 0, function* () {
-    const transaction = yield transaction_model_1.Transaction.findById(transactionId)
-        .populate("initiatedBy", "name email")
-        .populate("toWalletId", "userId");
+    const transaction = yield transaction_model_1.Transaction.findById(transactionId).populate("initiatedBy", "name email");
     return transaction;
 });
 // Get all transactions (for admin)
@@ -239,7 +237,6 @@ const getAllTransactions = (...args_1) => __awaiter(void 0, [...args_1], void 0,
         filter.type = type;
     const transactions = yield transaction_model_1.Transaction.find(filter)
         .populate("initiatedBy", "name email")
-        .populate("toWalletId", "userId")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);

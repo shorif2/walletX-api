@@ -32,6 +32,10 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
+    wallet: {
+      type: Schema.Types.ObjectId,
+      ref: "Wallet",
+    },
   },
   {
     timestamps: true,
