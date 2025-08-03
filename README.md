@@ -89,6 +89,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 #### Refresh Access Token
 **POST** `/auth/refresh-token`
+
 **Request:** (Cookie: refreshToken)
 
 **Response (200):**
