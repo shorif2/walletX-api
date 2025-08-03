@@ -48,8 +48,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Auth
 
-#### POST /auth/login
-
+#### User Login
+**POST** `/auth/login`
 **Request:**
 
 ```json
@@ -87,8 +87,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### POST /auth/refresh-token
-
+#### Refresh Access Token
+**POST** `/auth/refresh-token`
 **Request:** (Cookie: refreshToken)
 
 **Response (200):**
@@ -105,8 +105,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### POST /auth/logout
-
+#### User Logout
+**POST** `/auth/logout`
 **Request:** (No body, clears cookies)
 
 **Response (200):**
@@ -120,8 +120,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### POST /auth/reset-password
-
+#### Reset Password
+**POST** `/auth/reset-password`
 **Request:**
 
 ```json
@@ -144,8 +144,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### User
 
-#### POST /user/register
-
+#### Register New User
+**POST** `/user/register`
 **Request:**
 
 ```json
@@ -180,8 +180,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /user/all-users
-
+#### Get All Users (Admin)
+**GET** `/user/all-users`
 **Response (200):**
 
 ```json
@@ -223,8 +223,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /user/me
-
+#### Get Current User Profile
+**GET** `/user/me`
 **Response (200):**
 
 ```json
@@ -249,8 +249,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /user/profile
-
+#### Update User Profile
+**PATCH** `/user/profile`
 **Request:**
 
 ```json
@@ -284,8 +284,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /user/:id
-
+#### Get User by ID
+**GET** `/user/:id`
 **Response (200):**
 
 ```json
@@ -310,8 +310,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /user/:id/block
-
+#### Block User (Admin)
+**PATCH** `/user/:id/block`
 **Response (200):**
 
 ```json
@@ -336,8 +336,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /user/:id/unblock
-
+#### Unblock User (Admin)
+**PATCH** `/user/:id/unblock`
 **Response (200):**
 
 ```json
@@ -364,8 +364,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Wallet
 
-#### GET /wallet/user/:userId
-
+#### Get Wallet by User ID
+**GET** `/wallet/user/:userId`
 **Response (200):**
 
 ```json
@@ -382,8 +382,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /wallet/:walletNumber
-
+#### Get Wallet by Wallet Number
+**GET** `/wallet/:walletNumber`
 **Response (200):**
 
 ```json
@@ -396,8 +396,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /wallet/:userId/balance
-
+#### Update Wallet Balance
+**PATCH** `/wallet/:userId/balance`
 **Request:**
 
 ```json
@@ -422,8 +422,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /wallet/:userId/block
-
+#### Block Wallet
+**PATCH** `/wallet/:userId/block`
 **Response (200):**
 
 ```json
@@ -440,8 +440,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /wallet/:userId/unblock
-
+#### Unblock Wallet
+**PATCH** `/wallet/:userId/unblock`
 **Response (200):**
 
 ```json
@@ -460,8 +460,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Transaction
 
-#### POST /transaction/add
-
+#### Add Money to Wallet
+**POST** `/transaction/add`
 **Request:**
 
 ```json
@@ -489,8 +489,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### POST /transaction/send
-
+#### Send Money to Another User
+**POST** `/transaction/send`
 **Request:**
 
 ```json
@@ -519,8 +519,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### POST /transaction/withdraw
-
+#### Withdraw Money from Wallet
+**POST** `/transaction/withdraw`
 **Request:**
 
 ```json
@@ -548,8 +548,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### POST /transaction/cash-in
-
+#### Agent Cash-In to User Wallet
+**POST** `/transaction/cash-in`
 **Request:**
 
 ```json
@@ -578,8 +578,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### POST /transaction/cash-out
-
+#### Agent Cash-Out from User Wallet
+**POST** `/transaction/cash-out`
 **Request:**
 
 ```json
@@ -608,8 +608,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /transaction/my-history
-
+#### Get Current User's Transaction History
+**GET** `/transaction/my-history`
 **Response (200):**
 
 ```json
@@ -640,8 +640,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /transaction/:transactionId
-
+#### Get Transaction by ID
+**GET** `/transaction/:transactionId`
 **Response (200):**
 
 ```json
@@ -661,8 +661,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /transaction/
-
+#### Get All Transactions (Admin)
+**GET** `/transaction/`
 **Response (200):**
 
 ```json
@@ -695,8 +695,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ### Agent
 
-#### POST /agent/create
-
+#### Create Agent (Admin)
+**POST** `/agent/create`
 **Request:**
 
 ```json
@@ -726,8 +726,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /agent/all
-
+#### Get All Agents (Admin)
+**GET** `/agent/all`
 **Response (200):**
 
 ```json
@@ -758,8 +758,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### GET /agent/:id
-
+#### Get Agent by ID (Admin)
+**GET** `/agent/:id`
 **Response (200):**
 
 ```json
@@ -779,8 +779,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /agent/:id
-
+#### Update Agent (Admin)
+**PATCH** `/agent/:id`
 **Request:**
 
 ```json
@@ -808,8 +808,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### PATCH /agent/:id/status
-
+#### Update Agent Status (Admin)
+**PATCH** `/agent/:id/status`
 **Request:**
 
 ```json
@@ -837,8 +837,8 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-#### DELETE /agent/:id
-
+#### Delete Agent (Admin)
+**DELETE** `/agent/:id`
 **Response (200):**
 
 ```json
