@@ -60,7 +60,7 @@ const userSchema = new mongoose_1.Schema({
     isApproved: {
         type: String,
         enum: Object.values(user_types_1.isApproved),
-        default: user_types_1.isApproved.ACTIVE,
+        default: user_types_1.isApproved.PENDING,
     },
     isBlocked: {
         type: Boolean,

@@ -18,11 +18,9 @@ router.get("/all", (0, checkAuth_1.checkAuth)(user_types_1.Role.ADMIN, user_type
 router.get("/:id", (0, checkAuth_1.checkAuth)(user_types_1.Role.ADMIN, user_types_1.Role.SUPER_ADMIN), agent_controller_1.AgentControllers.getAgentById);
 // Update agent (Admin only)
 router.patch("/:id", (0, checkAuth_1.checkAuth)(user_types_1.Role.ADMIN, user_types_1.Role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(agent_validation_1.AgentValidation.agentIdParamSchema), (0, validateRequest_1.validateRequest)(agent_validation_1.AgentValidation.updateAgentSchema), agent_controller_1.AgentControllers.updateAgent);
-// Update agent status (Approve/Suspend) (Admin only)
+// Update agent status (Approve/Reject) (Admin only)
 router.patch("/:id/status", (0, checkAuth_1.checkAuth)(user_types_1.Role.ADMIN, user_types_1.Role.SUPER_ADMIN), 
 //   validateRequest(AgentValidation.agentIdParamSchema),
 //   validateRequest(AgentValidation.updateAgentStatusSchema),
 agent_controller_1.AgentControllers.updateAgentStatus);
-// Delete agent (Admin only)
-router.delete("/:id", (0, checkAuth_1.checkAuth)(user_types_1.Role.ADMIN, user_types_1.Role.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(agent_validation_1.AgentValidation.agentIdParamSchema), agent_controller_1.AgentControllers.deleteAgent);
 exports.AgentRoutes = router;

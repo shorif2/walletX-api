@@ -1,6 +1,6 @@
 import express from "express";
 import { TransactionController } from "./transaction.controller";
-import { checkAuth, checkAuthAndAgent } from "../../middlewares/checkAuth";
+import { checkAuth } from "../../middlewares/checkAuth";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { transactionValidation } from "./transaction.validation";
 
@@ -33,7 +33,7 @@ router.post(
 // Agent cash-in: Add money to any user's wallet
 router.post(
   "/cash-in",
-  checkAuthAndAgent("AGENT"),
+  checkAuth("AGENT"),
   validateRequest(transactionValidation.agentCashIn),
   TransactionController.agentCashIn
 );
@@ -41,7 +41,7 @@ router.post(
 // Agent cash-out: Withdraw money from any user's wallet
 router.post(
   "/cash-out",
-  checkAuthAndAgent("AGENT"),
+  checkAuth("AGENT"),
   validateRequest(transactionValidation.agentCashOut),
   TransactionController.agentCashOut
 );

@@ -17,9 +17,9 @@ router.post("/send", (0, checkAuth_1.checkAuth)("USER", "ADMIN"), (0, validateRe
 // Withdraw money from wallet
 router.post("/withdraw", (0, checkAuth_1.checkAuth)("USER"), (0, validateRequest_1.validateRequest)(transaction_validation_1.transactionValidation.withdrawMoney), transaction_controller_1.TransactionController.withdrawMoney);
 // Agent cash-in: Add money to any user's wallet
-router.post("/cash-in", (0, checkAuth_1.checkAuthAndAgent)("AGENT"), (0, validateRequest_1.validateRequest)(transaction_validation_1.transactionValidation.agentCashIn), transaction_controller_1.TransactionController.agentCashIn);
+router.post("/cash-in", (0, checkAuth_1.checkAuth)("AGENT"), (0, validateRequest_1.validateRequest)(transaction_validation_1.transactionValidation.agentCashIn), transaction_controller_1.TransactionController.agentCashIn);
 // Agent cash-out: Withdraw money from any user's wallet
-router.post("/cash-out", (0, checkAuth_1.checkAuthAndAgent)("AGENT"), (0, validateRequest_1.validateRequest)(transaction_validation_1.transactionValidation.agentCashOut), transaction_controller_1.TransactionController.agentCashOut);
+router.post("/cash-out", (0, checkAuth_1.checkAuth)("AGENT"), (0, validateRequest_1.validateRequest)(transaction_validation_1.transactionValidation.agentCashOut), transaction_controller_1.TransactionController.agentCashOut);
 // Get my transaction history
 router.get("/my-history", (0, checkAuth_1.checkAuth)("USER", "ADMIN"), transaction_controller_1.TransactionController.getMyTransactionHistory);
 // Get specific transaction by ID

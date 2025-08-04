@@ -58,44 +58,18 @@ const getAgentById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     }
     return agent;
 });
-const updateAgentStatus = (id, statusData, updatedBy) => __awaiter(void 0, void 0, void 0, function* () {
-    const agent = yield agent_model_1.Agent.findById(id);
+const updateAgentStatus = (id, status) => __awaiter(void 0, void 0, void 0, function* () {
+    const agent = yield user_model_1.User.findById(id).select("-updatedAt -password");
     if (!agent) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Agent not found");
     }
-    const updateData = {
-        status: statusData.status,
-    };
-    // Handle different status updates
-    switch (statusData.status) {
-        case agent_types_1.AgentStatus.APPROVED:
-            if (agent.status === agent_types_1.AgentStatus.APPROVED) {
-                throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Agent is already approved");
-            }
-            // Clear suspension data if approving
-            updateData.suspendedBy = null;
-            updateData.suspensionReason = null;
-            break;
-        case agent_types_1.AgentStatus.SUSPENDED:
-            if (agent.status === agent_types_1.AgentStatus.SUSPENDED) {
-                throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Agent is already suspended");
-            }
-            if (!statusData.reason) {
-                throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "Suspension reason is required");
-            }
-            updateData.suspendedBy = updatedBy;
-            updateData.suspensionReason = statusData.reason;
-            break;
+    if (agent.isApproved === status) {
+        throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `Agent is already ${status.toLocaleLowerCase()}`);
     }
-    const updatedAgent = yield agent_model_1.Agent.findByIdAndUpdate(id, updateData, {
+    const updatedAgent = yield user_model_1.User.findByIdAndUpdate(id, { isApproved: status }, {
         new: true,
         runValidators: true,
-    })
-        .populate("createdBy", "name email")
-        .populate("suspendedBy", "name email");
-    if (!updatedAgent) {
-        throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Agent not found");
-    }
+    });
     return updatedAgent;
 });
 const getAgentsByStatus = (status) => __awaiter(void 0, void 0, void 0, function* () {

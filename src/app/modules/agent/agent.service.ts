@@ -1,16 +1,12 @@
 import { Types } from "mongoose";
 import { Agent } from "./agent.model";
-import {
-  IAgent,
-  AgentStatus,
-  IAgentCreateRequest,
-  IAgentStatusUpdateRequest,
-} from "./agent.types";
+import { IAgent, AgentStatus, IAgentCreateRequest } from "./agent.types";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import { envVars } from "../../config/env";
 import { User } from "../user/user.model";
+import { isApproved, IUser } from "../user/user.types";
 
 const createAgent = async (
   agentData: IAgentCreateRequest,
@@ -82,59 +78,27 @@ const getAgentById = async (id: string): Promise<IAgent> => {
 
 const updateAgentStatus = async (
   id: string,
-  statusData: IAgentStatusUpdateRequest,
-  updatedBy: Types.ObjectId
-): Promise<IAgent> => {
-  const agent = await Agent.findById(id);
+  status: isApproved
+): Promise<IUser> => {
+  const agent = await User.findById(id).select("-updatedAt -password");
   if (!agent) {
     throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
   }
-
-  const updateData: Record<string, unknown> = {
-    status: statusData.status,
-  };
-
-  // Handle different status updates
-  switch (statusData.status) {
-    case AgentStatus.APPROVED:
-      if (agent.status === AgentStatus.APPROVED) {
-        throw new AppError(httpStatus.BAD_REQUEST, "Agent is already approved");
-      }
-      // Clear suspension data if approving
-      updateData.suspendedBy = null;
-      updateData.suspensionReason = null;
-      break;
-
-    case AgentStatus.SUSPENDED:
-      if (agent.status === AgentStatus.SUSPENDED) {
-        throw new AppError(
-          httpStatus.BAD_REQUEST,
-          "Agent is already suspended"
-        );
-      }
-      if (!statusData.reason) {
-        throw new AppError(
-          httpStatus.BAD_REQUEST,
-          "Suspension reason is required"
-        );
-      }
-      updateData.suspendedBy = updatedBy;
-      updateData.suspensionReason = statusData.reason;
-      break;
+  if (agent.isApproved === status) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Agent is already ${status.toLocaleLowerCase()}`
+    );
   }
-
-  const updatedAgent = await Agent.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  })
-    .populate("createdBy", "name email")
-    .populate("suspendedBy", "name email");
-
-  if (!updatedAgent) {
-    throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
-  }
-
-  return updatedAgent;
+  const updatedAgent = await User.findByIdAndUpdate(
+    id,
+    { isApproved: status },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  return updatedAgent as IUser;
 };
 
 const getAgentsByStatus = async (status: AgentStatus): Promise<IAgent[]> => {

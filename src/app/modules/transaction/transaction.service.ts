@@ -261,7 +261,7 @@ const agentCashOut = async (
 
 // Get transaction history for a wallet
 const getTransactionHistory = async (
-  walletNumber: any,
+  walletNumber: string,
   page = 1,
   limit = 10
 ): Promise<{

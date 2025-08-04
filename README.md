@@ -84,7 +84,7 @@ FRONTEND_URL=http://localhost:5173
 
 All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
-### Auth
+# Auth
 
 ### User Login
 
@@ -127,9 +127,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-````
-
-#### User Logout
+### Logout
 
 **POST** `/auth/logout`
 
@@ -144,7 +142,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
   "message": "User Logged Out Successfully",
   "data": null
 }
-````
+```
 
 ### Reset Password
 
@@ -170,22 +168,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-### LogOut
-
-**POST** `/auth/logout`
-
-**Response (200):**
-
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "User Logged Out Successfully",
-  "data": null
-}
-```
-
-### User
+# User
 
 ### Register New User
 
@@ -217,6 +200,41 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
     "isBlocked": false,
     "createdAt": "2025-08-03T21:02:43.072Z",
     "wallet": "688fce730abe271d15a250b2"
+  }
+}
+```
+
+### Register As Agent
+
+**POST** `/user/register`
+
+**Request:**
+
+```json
+{
+  "name": "Agent carter",
+  "email": "carter@walletx.com",
+  "password": "Password123!",
+  "role": "AGENT"
+}
+```
+
+**Response (201):**
+
+```json
+{
+  "statusCode": 201,
+  "success": true,
+  "message": "User Created Successfully",
+  "data": {
+    "_id": "689092a37f1cbd8147e1ab75",
+    "name": "Agent carter",
+    "email": "carter@walletx.com",
+    "role": "AGENT",
+    "isApproved": "PENDING",
+    "isBlocked": false,
+    "createdAt": "2025-08-04T10:59:47.151Z",
+    "wallet": "689092a37f1cbd8147e1ab78"
   }
 }
 ```
@@ -355,17 +373,17 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
   "success": true,
   "message": "User has been blocked",
   "data": {
-    "_id": "688f13c370953c7cce0e9c51",
-    "name": "User Jack",
-    "email": "user2@walletx.com",
+    "_id": "688fcf060abe271d15a250bf",
+    "name": "Jack Ahamed",
+    "email": "jack@walletx.com",
     "role": "USER",
     "isApproved": "ACTIVE",
     "isBlocked": true,
-    "createdAt": "2025-08-03T07:46:11.995Z",
+    "createdAt": "2025-08-03T21:05:10.668Z",
     "wallet": {
-      "walletNumber": "WAL7912698725",
-      "balance": 165,
-      "isBlocked": false
+      "walletNumber": "WAL2050871411",
+      "balance": 50,
+      "isBlocked": true
     }
   }
 }
@@ -383,79 +401,23 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
   "success": true,
   "message": "User has been unblocked",
   "data": {
-    "_id": "688f13c370953c7cce0e9c51",
-    "name": "User Jack",
-    "email": "user2@walletx.com",
+    "_id": "688fcf060abe271d15a250bf",
+    "name": "Jack Ahamed",
+    "email": "jack@walletx.com",
     "role": "USER",
     "isApproved": "ACTIVE",
     "isBlocked": false,
-    "createdAt": "2025-08-03T07:46:11.995Z",
+    "createdAt": "2025-08-03T21:05:10.668Z",
     "wallet": {
-      "walletNumber": "WAL7912698725",
-      "balance": 165,
-      "isBlocked": false
+      "walletNumber": "WAL2050871411",
+      "balance": 50,
+      "isBlocked": true
     }
   }
 }
 ```
 
-### Block User (Admin)
-
-**PATCH** `/user/:id/block`
-
-**Response (200):**
-
-```json
-{
-  "statusCode": 200,
-  "success": true,
-  "message": "User has been blocked",
-  "data": {
-    "_id": "688f13c370953c7cce0e9c51",
-    "name": "User Jack",
-    "email": "user2@walletx.com",
-    "role": "USER",
-    "isApproved": "ACTIVE",
-    "isBlocked": true,
-    "createdAt": "2025-08-03T07:46:11.995Z",
-    "wallet": {
-      "walletNumber": "WAL7912698725",
-      "balance": 165,
-      "isBlocked": false
-    }
-  }
-}
-```
-
-### Unblock User (Admin)
-
-**PATCH** `/user/:id/unblock`
-
-**Response (200):**
-
-```json
-{
-  "statusCode": 200,
-  "success": true,
-  "message": "User has been unblocked",
-  "data": {
-    "_id": "688f13c370953c7cce0e9c51",
-    "name": "User Jack",
-    "email": "user2@walletx.com",
-    "role": "USER",
-    "isApproved": "ACTIVE",
-    "isBlocked": false,
-    "createdAt": "2025-08-03T07:46:11.995Z",
-    "wallet": {
-      "walletNumber": "WAL7912698725",
-      "balance": 165,
-      "isBlocked": false
-    }
-  }
-}
-```
-
-### Wallet
+# Wallet
 
 ### Get Wallet by User ID
 
@@ -550,62 +512,6 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 
 ```json
 {
-  "success": true,
-  "message": "Wallet unblocked successfully",
-  "data": {
-    "_id": "688fceea0abe271d15a250ba",
-    "walletNumber": "WAL4758189412",
-    "balance": 50,
-    "accountType": "Savings",
-    "isBlocked": false,
-    "user": {
-      "_id": "688fcee90abe271d15a250b7",
-      "name": "Shorif Ahamed",
-      "email": "shorif@walletx.com",
-      "role": "USER",
-      "isBlocked": false
-    },
-    "createdAt": "2025-08-03T21:19:13.946Z"
-  }
-}
-```
-
-### Update Wallet Balance
-
-**PATCH** `/wallet/:userId/balance`
-
-**Request:**
-
-```json
-{
-  "amount": 100
-}
-```
-
-**Response (200):**
-
-```json
-{
-  "statusCode": 200,
-  "success": true,
-  "message": "Wallet balance updated successfully",
-  "data": {
-    "walletNumber": "WAL7912698725",
-    "balance": 265,
-    "isBlocked": false,
-    "userId": "688f13c370953c7cce0e9c51"
-  }
-}
-```
-
-### Unblock Wallet
-
-**PATCH** `/wallet/:userId/unblock`
-
-**Response (200):**
-
-```json
-{
   "statusCode": 200,
   "success": true,
   "message": "Wallet unblocked successfully",
@@ -618,7 +524,7 @@ All endpoints are prefixed with `https://wallet-x-api.vercel.app/api/v1`.
 }
 ```
 
-### Transaction
+# Transaction
 
 ### Add Money to Wallet
 
@@ -984,40 +890,7 @@ Supports filtering, and sorting.
 }
 ```
 
-### Agent
-
-### Create Agent (Admin)
-
-**POST** `/agent/create`
-
-**Request:**
-
-```json
-{
-  "name": "Agent Smith",
-  "email": "agent@example.com",
-  "password": "123456"
-}
-```
-
-**Response (201):**
-
-```json
-{
-  "statusCode": 201,
-  "success": true,
-  "message": "Agent created successfully",
-  "data": {
-    "_id": "888f13c370953c7cce0e9c01",
-    "name": "Agent Smith",
-    "email": "agent@example.com",
-    "role": "AGENT",
-    "status": "ACTIVE",
-    "isBlocked": false,
-    "createdAt": "2025-08-03T10:00:00.000Z"
-  }
-}
-```
+# Agent
 
 ### Get All Agents (Admin)
 
@@ -1115,7 +988,7 @@ Supports filtering, and sorting.
 
 ```json
 {
-  "status": "active"
+  "status": "APPROVED"
 }
 ```
 
@@ -1125,35 +998,81 @@ Supports filtering, and sorting.
 {
   "statusCode": 200,
   "success": true,
-  "message": "Agent status updated successfully",
+  "message": "Agent has been APPROVED successfully",
   "data": {
-    "_id": "888f13c370953c7cce0e9c01",
-    "name": "Agent Smith",
-    "email": "agent@example.com",
+    "_id": "689092a37f1cbd8147e1ab75",
+    "name": "Agent carter",
+    "email": "carter@walletx.com",
     "role": "AGENT",
-    "status": "ACTIVE",
+    "isApproved": "APPROVED",
     "isBlocked": false,
-    "createdAt": "2025-08-03T10:00:00.000Z"
+    "createdAt": "2025-08-04T10:59:47.151Z",
+    "wallet": "689092a37f1cbd8147e1ab78"
   }
 }
 ```
 
-### Delete Agent (Admin)
+### Agent Cash-In
 
-**DELETE** `/agent/:id`
+**POST** `/transaction/cash-in`
+
+**Request:**
+
+```json
+{ "walletNumber": "WAL4765095969", "amount": 10, "note": "payment" }
+```
 
 **Response (200):**
 
 ```json
 {
-  "statusCode": 200,
   "success": true,
-  "message": "Agent deleted successfully",
-  "data": null
+  "message": "Agent cash-in completed successfully",
+  "data": {
+    "walletNumber": "WAL4765095969",
+    "type": "cash-in",
+    "initiatedBy": "689092a37f1cbd8147e1ab75",
+    "note": "Agent cash-in",
+    "amount": 11,
+    "status": "completed",
+    "_id": "6890a7622dd608426c54ede2",
+    "createdAt": "2025-08-04T12:28:18.365Z",
+    "updatedAt": "2025-08-04T12:28:18.365Z"
+  }
 }
 ```
 
-## Technologies Used
+### Agent Cash-Out
+
+**POST** `/transaction/cash-out`
+
+**Request:**
+
+```json
+{ "walletNumber": "WAL4765095969", "amount": 10, "note": "Maintanance Fee" }
+```
+
+**Response (200):**
+
+```json
+{
+  "success": true,
+  "message": "Agent cash-out completed successfully",
+  "data": {
+    "walletNumber": "WAL4765095969",
+    "type": "cash-out",
+    "initiatedBy": "689092a37f1cbd8147e1ab75",
+    "note": "Agent cash-out: Birthday Gift",
+    "amount": 10,
+    "status": "completed",
+    "_id": "6890a5e90297bbbf9af49688",
+    "createdAt": "2025-08-04T12:22:01.178Z",
+    "updatedAt": "2025-08-04T12:22:01.178Z"
+  }
+}
+```
+
+# Technologies Used
 
 - Node.js, Express.js
 - TypeScript
@@ -1163,6 +1082,6 @@ Supports filtering, and sorting.
 - Session Management
 - ESLint, TypeScript, and modern tooling
 
-## License
+# License
 
 ISC

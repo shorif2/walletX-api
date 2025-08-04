@@ -7,8 +7,9 @@ export enum Role {
   AGENT = "AGENT",
 }
 export enum isApproved {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
   BLOCKED = "BLOCKED",
 }
 

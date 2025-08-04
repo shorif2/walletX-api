@@ -35,7 +35,8 @@ const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0
             throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, "User does not exist");
         }
         if (isUserExist.isApproved === user_types_1.isApproved.BLOCKED ||
-            isUserExist.isApproved === user_types_1.isApproved.INACTIVE) {
+            isUserExist.isApproved === user_types_1.isApproved.REJECTED ||
+            isUserExist.isApproved === user_types_1.isApproved.PENDING) {
             throw new AppError_1.default(http_status_codes_1.default.BAD_REQUEST, `User is ${isUserExist.isApproved}`);
         }
         if (isUserExist.isBlocked) {

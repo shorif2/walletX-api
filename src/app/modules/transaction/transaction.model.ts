@@ -10,11 +10,7 @@ const TransactionSchema = new Schema<ITransaction>(
     senderWallet: {
       type: String,
       required: function (this: ITransaction) {
-        return (
-          this.type === TransactionType.SEND ||
-          this.type === TransactionType.CASH_IN ||
-          this.type === TransactionType.CASH_OUT
-        );
+        return this.type === TransactionType.SEND;
       },
     },
     walletNumber: {

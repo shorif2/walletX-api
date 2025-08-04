@@ -38,21 +38,13 @@ router.patch(
   AgentControllers.updateAgent
 );
 
-// Update agent status (Approve/Suspend) (Admin only)
+// Update agent status (Approve/Reject) (Admin only)
 router.patch(
   "/:id/status",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   //   validateRequest(AgentValidation.agentIdParamSchema),
   //   validateRequest(AgentValidation.updateAgentStatusSchema),
   AgentControllers.updateAgentStatus
-);
-
-// Delete agent (Admin only)
-router.delete(
-  "/:id",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
-  validateRequest(AgentValidation.agentIdParamSchema),
-  AgentControllers.deleteAgent
 );
 
 export const AgentRoutes = router;

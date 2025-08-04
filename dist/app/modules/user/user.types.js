@@ -10,7 +10,8 @@ var Role;
 })(Role || (exports.Role = Role = {}));
 var isApproved;
 (function (isApproved) {
-    isApproved["ACTIVE"] = "ACTIVE";
-    isApproved["INACTIVE"] = "INACTIVE";
+    isApproved["PENDING"] = "PENDING";
+    isApproved["APPROVED"] = "APPROVED";
+    isApproved["REJECTED"] = "REJECTED";
     isApproved["BLOCKED"] = "BLOCKED";
 })(isApproved || (exports.isApproved = isApproved = {}));

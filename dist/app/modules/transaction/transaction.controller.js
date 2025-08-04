@@ -90,7 +90,6 @@ const getMyTransactionHistory = (0, catchAsync_1.catchAsync)((req, res) => __awa
     }
     // Get user's wallet
     const wallet = yield wallet_service_1.WalletServices.getWalletByUserId(userId);
-    console.log(wallet);
     if (!wallet) {
         throw new AppError_1.default(http_status_codes_1.default.NOT_FOUND, "Wallet not found");
     }

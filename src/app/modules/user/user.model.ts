@@ -26,7 +26,7 @@ const userSchema = new Schema<IUser>(
     isApproved: {
       type: String,
       enum: Object.values(isApproved),
-      default: isApproved.ACTIVE,
+      default: isApproved.PENDING,
     },
     isBlocked: {
       type: Boolean,

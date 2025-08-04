@@ -40,9 +40,7 @@ const TransactionSchema = new mongoose_1.Schema({
     senderWallet: {
         type: String,
         required: function () {
-            return (this.type === transaction_types_1.TransactionType.SEND ||
-                this.type === transaction_types_1.TransactionType.CASH_IN ||
-                this.type === transaction_types_1.TransactionType.CASH_OUT);
+            return this.type === transaction_types_1.TransactionType.SEND;
         },
     },
     walletNumber: {

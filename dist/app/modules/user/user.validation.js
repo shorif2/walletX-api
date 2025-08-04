@@ -27,6 +27,12 @@ exports.createUserZodSchema = zod_1.default.object({
         .regex(/^(?=.*\d)/, {
         message: "Password must contain at least 1 number.",
     }),
+    role: zod_1.default
+        .string({ error: "Role must be string" })
+        .refine((value) => value === "USER" || value === "AGENT", {
+        message: "Role must be USER or AGENT",
+    })
+        .optional(),
     phone: zod_1.default
         .string({ error: "Phone Number must be string" })
         .regex(/^(?:\+8801\d{9}|01\d{9})$/, {

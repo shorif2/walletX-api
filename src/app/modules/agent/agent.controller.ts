@@ -72,34 +72,14 @@ const updateAgent = catchAsync(async (req: Request, res: Response) => {
 
 const updateAgentStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const statusData = req.body;
-  console.log(req.body);
-  const updatedBy = req.user?._id;
+  const { status } = req.body;
 
-  if (!updatedBy) {
-    throw new Error("User not authenticated");
-  }
-
-  const result = await AgentService.updateAgentStatus(
-    id,
-    statusData,
-    updatedBy
-  );
-
-  let message = "Agent status updated successfully";
-  switch (statusData.status) {
-    case AgentStatus.APPROVED:
-      message = "Agent has been unsuspended and approved";
-      break;
-    case AgentStatus.SUSPENDED:
-      message = "Agent suspended successfully";
-      break;
-  }
+  const result = await AgentService.updateAgentStatus(id, status);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message,
+    message: `Agent has been ${result.isApproved?.toLocaleLowerCase()} successfully`,
     data: result,
   });
 });
@@ -116,17 +96,6 @@ const deleteAgent = catchAsync(async (req: Request, res: Response) => {
     data: null,
   });
 });
-
-// const getSuspendedAgents = catchAsync(async (req: Request, res: Response) => {
-//   const result = await AgentService.getSuspendedAgents();
-
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: "Suspended agents retrieved successfully",
-//     data: result,
-//   });
-// });
 
 export const AgentControllers = {
   createAgent,

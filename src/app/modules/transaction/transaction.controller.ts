@@ -107,14 +107,12 @@ const getMyTransactionHistory = catchAsync(
 
     // Get user's wallet
     const wallet = await WalletServices.getWalletByUserId(userId as any);
-
-    console.log(wallet);
     if (!wallet) {
       throw new AppError(httpStatus.NOT_FOUND, "Wallet not found");
     }
 
     const result = await TransactionServices.getTransactionHistory(
-      wallet.walletNumber,
+      wallet.walletNumber as string,
       page,
       limit
     );

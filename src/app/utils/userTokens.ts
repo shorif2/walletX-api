@@ -45,7 +45,8 @@ export const createNewAccessTokenWithRefreshToken = async (
   }
   if (
     isUserExist.isApproved === isApproved.BLOCKED ||
-    isUserExist.isApproved === isApproved.INACTIVE
+    isUserExist.isApproved === isApproved.REJECTED ||
+    isUserExist.isApproved === isApproved.PENDING
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,

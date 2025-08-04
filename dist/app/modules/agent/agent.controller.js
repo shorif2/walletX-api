@@ -13,7 +13,6 @@ exports.AgentControllers = void 0;
 const catchAsync_1 = require("../../utils/catchAsync");
 const sendResponse_1 = require("../../utils/sendResponse");
 const agent_service_1 = require("./agent.service");
-const agent_types_1 = require("./agent.types");
 const createAgent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const agentData = req.body;
@@ -70,26 +69,12 @@ const updateAgent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
 const updateAgentStatus = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { id } = req.params;
-    const statusData = req.body;
-    console.log(req.body);
-    const updatedBy = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
-    if (!updatedBy) {
-        throw new Error("User not authenticated");
-    }
-    const result = yield agent_service_1.AgentService.updateAgentStatus(id, statusData, updatedBy);
-    let message = "Agent status updated successfully";
-    switch (statusData.status) {
-        case agent_types_1.AgentStatus.APPROVED:
-            message = "Agent has been unsuspended and approved";
-            break;
-        case agent_types_1.AgentStatus.SUSPENDED:
-            message = "Agent suspended successfully";
-            break;
-    }
+    const { status } = req.body;
+    const result = yield agent_service_1.AgentService.updateAgentStatus(id, status);
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: 200,
         success: true,
-        message,
+        message: `Agent has been ${(_a = result.isApproved) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase()} successfully`,
         data: result,
     });
 }));
@@ -103,15 +88,6 @@ const deleteAgent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: null,
     });
 }));
-// const getSuspendedAgents = catchAsync(async (req: Request, res: Response) => {
-//   const result = await AgentService.getSuspendedAgents();
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: "Suspended agents retrieved successfully",
-//     data: result,
-//   });
-// });
 exports.AgentControllers = {
     createAgent,
     getAllAgents,

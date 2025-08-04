@@ -1,7 +1,7 @@
 import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { User } from "./user.model";
-import { IUser } from "./user.types";
+import { isApproved, IUser } from "./user.types";
 import bcryptjs from "bcryptjs";
 import httpStatus from "http-status-codes";
 import { WalletServices } from "../wallet/wallet.service";
@@ -9,7 +9,7 @@ import { Types } from "mongoose";
 import { Agent } from "../agent/agent.model";
 
 const createUser = async (payload: Partial<IUser>) => {
-  const { email, password, ...rest } = payload;
+  const { email, password, role = "USER", ...rest } = payload;
 
   const isUserExist = await User.findOne({ email });
   const isAgentExist = await Agent.findOne({ email });
@@ -26,6 +26,8 @@ const createUser = async (payload: Partial<IUser>) => {
   const user = await User.create({
     email,
     password: hashedPassword,
+    role,
+    isApproved: role === "USER" ? isApproved.APPROVED : isApproved.PENDING,
     ...rest,
   });
   // Automatically create wallet for the new user
