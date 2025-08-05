@@ -2,26 +2,17 @@
 
 ## Project Overview
 
-Wallet-X is a secure, modular, and role-based backend API for a digital wallet system. Built with Express.js and Mongoose, it provides enterprise-grade payment infrastructure, secure transactions, global reach, and seamless integration for modern financial applications.
+Wallet-X is a secure and modular Digital Wallet API with JWT authentication and role-based access for Admins, Users, and Agents. Supports wallet creation on registration, money transfers, withdrawals, top-ups, and full transaction tracking. Admins can manage users, agents, and wallets with route-level access control.
 
 ### **📌 Key Features of this project**
 
-- ✅ JWT-based login system with three roles: `admin`, `user`, `agent`
-- ✅ Secure password hashing using bcrypt
-- ✅ Each user and agent must have a wallet automatically created at registration (e.g., initial balance: ৳50)
-- ✅ Users can:
-  - Add money (top-up)
-  - Withdraw money
-  - Send money to another user
-  - View transaction history
-- ✅ Agents can:
-  - Add money to any user's wallet (cash-in)
-  - Withdraw money from any user's wallet (cash-out)
-- ✅ Admins can:
-  - View all users, agents, wallets and transactions
-  - Block/unblock user wallets
-  - Approve/suspend agents
-- ✅ All transactions must be **stored and trackable**
+- 🔐 JWT-based login system with secure password hashing
+- Role-based access for Admins, Users, and Agents
+- 💳 Automatic wallet creation on registration with initial balance
+- 💸 Full transaction capabilities: top-up, withdraw, send money
+- 🧾 Persistent transaction logging and history tracking
+- 🛡️ Route protection based on user roles
+- 🧑‍💼 Admin controls for user/agent management and wallet access
 - ✅ Role-based route protection must be implemented
 
 ## Setup and Environment Instructions

@@ -93,7 +93,16 @@
         margin-left: auto;
         margin-right: auto;
       }
-
+      .title {
+        font-size: clamp(2rem, 3vw, 1.5rem);
+        color: #c2cbd7;
+        margin-bottom: 0.5rem;
+        font-weight: 400;
+        line-height: 1.6;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
       .banner-buttons {
         display: flex;
         gap: 1.5rem;
@@ -343,11 +352,13 @@
       </div>
 
       <div class="banner-content">
-        <h1>Hello from Wallet-X API!</h1>
+        <p class="title">Hello From</p>
+        <h1>Wallet-X API!</h1>
         <p class="subtitle">
-          Enterprise-grade payment infrastructure that scales with your
-          business. Secure transactions, global reach, and seamless integration
-          in one powerful API.
+          Wallet-X is a secure and modular Digital Wallet API with JWT
+          authentication and role-based access for Admins, Users, and Agents.
+          Supports wallet creation on registration, money transfers,
+          withdrawals, top-ups, and full transaction tracking.
         </p>
         <div class="banner-buttons">
           <a href="#" class="btn btn-primary">Start Building</a>
