@@ -49,10 +49,6 @@ BCRYPT_SALT_ROUND=10
 SUPER_ADMIN_EMAIL=superAdmin@walletx.com
 SUPER_ADMIN_PASSWORD=walletX123
 
-# Google
-GOOGLE_CLIENT_SECRET=googleClientSecret
-GOOGLE_CLIENT_ID=googleClientId
-GOOGLE_CALLBACK_URL=http://localhost:5000/api/v1/auth/google/callback
 
 # Express Session
 EXPRESS_SESSION_SECRET=express-session
